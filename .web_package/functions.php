@@ -28,18 +28,6 @@ function js_replace_version_function(&$source, $new_version) {
 }
 
 /**
- * Replaces a version as it's being declared a property
- *
- * Expecting to find this type of thing: this.version    = '0.0.1'
- *
- * @param  string &$source
- * @param  string $new_version
- */
-function js_replace_version_property(&$source, $new_version) {
-  $source = preg_replace("/(this\.version\s*=\s*['\"]?)([^'\"]+)/", "\${1}{$new_version}", $source);
-}
-
-/**
  * Copy files from root into demo.
  *
  * @param  array $files

@@ -1,5 +1,5 @@
 /**
- * Underlayer Slide jQuery JavaScript Plugin v1.0 version }}
+ * Underlayer Slide jQuery JavaScript Plugin v0.0.1
  * http://www.intheloftstudios.com/packages/jquery/jquery.underlayer_slide
  *
  * Plugin to register an under layer that slides out from under a container when triggered.
@@ -7,7 +7,7 @@
  * Copyright 2013, Aaron Klump
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Sat Nov 15 08:49:58 PST 2014
+ * Date: Sat Nov 15 08:57:11 PST 2014
  *
  * @license
  */
@@ -30,7 +30,6 @@ underlayer.style = '';
 // The actual plugin constructor
 function UnderlayerSlide(element, options) {
   this.class      = 'UnderlayerSlide';
-  this.version    = '0.0.1';
   this.element    = element;
   this.$wrapper   = $(element);
   this.$toggle    = $(options.toggle);
@@ -197,12 +196,11 @@ $.fn.underlayerSlide.defaults = {
   "cssPrefix"         : 'uls-'  
 };
 
-$.fn.underlayerSlide.global = {};
-
-$.fn.underlayerSlide.somePublicMethod  = function () {
-
-};
-
-$.fn.underlayerSlide.version = function() { return '1.0'; };
+/**
+ * Returns the version of this plugin.
+ *
+ * @return {string}
+ */
+$.fn.underlayerSlide.version = function() { return '0.0.1'; };
 
 })(jQuery, window, document);
