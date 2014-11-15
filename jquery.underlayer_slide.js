@@ -9,6 +9,22 @@
  *
  * Date: Sat Nov 15 08:57:11 PST 2014
  *
+ * Helper css classes applied by this plugin (all are prefixed):
+ *
+ * On the underlayer element:
+ * - underlayer
+ * - visible
+ * - showing
+ * - hiding
+ *
+ * On the toggle element:
+ * - toggle
+ * - active
+ *
+ * On the wrapper element:
+ * - wrapper
+ * - processed
+ *
  * @license
  */
 ;(function($, window, document, undefined) {
@@ -23,7 +39,7 @@ underlayer.css.hidden = {
 };
 underlayer.css.visible = {
   "position": "static",
-  "display": "block"
+  "display": "block",
 };
 underlayer.style = '';
 
@@ -34,23 +50,15 @@ function UnderlayerSlide(element, options) {
   this.$wrapper   = $(element);
   this.$toggle    = $(options.toggle);
   this.$under     = $(options.under);
-
-  // jQuery has an extend method that merges the 
-  // contents of two or more objects, storing the 
-  // result in the first object. The first object 
-  // is generally empty because we don't want to alter 
-  // the default options for future instances of the plugin
-  this.options = $.extend( {}, $.fn.underlayerSlide.defaults, options) ;
-  
-  this._defaults = $.fn.underlayerSlide.defaults;
-  // this._name = 'underlayerSlide';
+  this.options    = $.extend( {}, $.fn.underlayerSlide.defaults, options) ;
+  this._defaults  = $.fn.underlayerSlide.defaults;
   
   this.init();
 }
 
 UnderlayerSlide.prototype.toString = function() {
   return this.class;
-}
+};
 
 UnderlayerSlide.prototype.init = function () {
   // Place initialization logic here
@@ -105,32 +113,75 @@ UnderlayerSlide.prototype.destroy = function () {
 UnderlayerSlide.prototype.toggle = function() {
   var p         = this.options.cssPrefix;
   var visible   = this.$under.hasClass(p + 'visible');
-  this.$under.toggleClass(p + 'visible');
-  this.$toggle.toggleClass(p + 'active');
-
   return visible ? this.hide() : this.show();
 };
 
 UnderlayerSlide.prototype.show = function() {
-  if (typeof this.options.show === "function") {
-    return this.options.show(this);
+  var self      = this;
+  var p         = this.options.cssPrefix;
+
+  self.options.beforeShow(self);
+  self.$toggle.addClass(p + 'active');
+  self.$under.addClass(p + 'showing');
+
+  /**
+   * A function that should be called when showing has completed.
+   *
+   * @var function
+   */
+  var callback = function () {
+    self.$under
+    .addClass(p + 'visible')
+    .removeClass(p + 'showing');
+    self.options.afterShow(self);
+  }
+
+  // Custom show function.
+  if (typeof self.options.show === "function") {
+    return self.options.show(self, callback);
   }
 
   // The default showing.
-  this.$under.css(underlayer.css.visible);
+  else {
+    self.$under.css(underlayer.css.visible);
+    callback();
+  }
 
-  return this;
+  return self;
 };
 
 UnderlayerSlide.prototype.hide = function() {
-  if (typeof this.options.hide === "function") {
-    return this.options.hide(this);
-  }
-  
-  // The default hiding.
-  this.$under.css(underlayer.css.hidden);
+  var self      = this;
+  var p         = self.options.cssPrefix;
 
-  return this;
+  self.options.beforeHide(self);
+  self.$toggle.removeClass(p + 'active');
+  self.$under.addClass(p + 'hiding');
+
+  /**
+   * A function that should be called when showing has completed.
+   *
+   * @var function
+   */
+  var callback = function () {
+    self.$under
+    .removeClass(p + 'visible')
+    .removeClass(p + 'hiding');
+    self.options.afterHide(self);
+  };
+
+  // Custom hide function.
+  if (typeof self.options.hide === "function") {
+    return self.options.hide(self, callback);
+  }
+
+  // The default showing.
+  else {
+    self.$under.css(underlayer.css.hidden);
+    callback();
+  }
+
+  return self;
 };
 
 $.fn.underlayerSlide = function(options) {
@@ -171,14 +222,46 @@ $.fn.underlayerSlide.defaults = {
    * @var type
    */
   "direction"         : "down",
-  
+
+  /**
+   * A function to call before the showing begins.
+   *
+   * @var function
+   */
+  "beforeShow"        : function(instance) {},
+
+  /**
+   * A function to call AFTER the showing has completed.
+   *
+   * @var function
+   */
+  "afterShow"         : function(instance) {},
+
   /**
    * Defines a custom function to be used instead of the default for EXPOSING
    * the underlayer.
    *
+   * Receives the UnderlayerSlide object and a function to apply after the
+   * exposition has completed.  You MUST call that second function at some
+   * point when using this feature.
+   *
    * @var function
    */
   "show"              : null,
+
+  /**
+   * A function to call before the hiding begins.
+   *
+   * @var function
+   */
+  "beforeHide"        : function(instance) {},
+
+  /**
+   * A function to call AFTER the hiding has completed.
+   *
+   * @var function
+   */  
+  "afterHide"         : function(instance) {},
 
   /**
    * Defines a custom function to be used instead of the default for HIDING

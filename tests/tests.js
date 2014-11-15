@@ -1,3 +1,57 @@
+QUnit.test("beforeHide and afterHide callbacks are triggered.", function(assert) {
+  var $wrap       = $('.example-wrapper');
+  var $toggle     = $('.example-toggle');
+  var $layer      = $('.example-underlayer');
+
+  var beforeHide  = false;
+  var afterHide   = false;
+  
+  $wrap.underlayerSlide({
+    "toggle": '.example-toggle',
+    "under": '.example-underlayer',
+    "beforeHide": function (obj) {
+      beforeHide = obj;
+    },
+    "afterHide": function (obj) {
+      afterHide = obj;
+    }
+  });
+  var obj = $wrap.data('plugin_underlayerSlide');
+
+  assert.ok(!beforeHide);
+  assert.ok(!afterHide);
+  obj.hide();
+  assert.deepEqual(beforeHide.class, 'UnderlayerSlide');
+  assert.deepEqual(afterHide.class, 'UnderlayerSlide');
+});
+
+QUnit.test("beforeShow and afterShow callbacks are triggered.", function(assert) {
+  var $wrap       = $('.example-wrapper');
+  var $toggle     = $('.example-toggle');
+  var $layer      = $('.example-underlayer');
+
+  var beforeShow  = false;
+  var afterShow   = false;
+  
+  $wrap.underlayerSlide({
+    "toggle": '.example-toggle',
+    "under": '.example-underlayer',
+    "beforeShow": function (obj) {
+      beforeShow = obj;
+    },
+    "afterShow": function (obj) {
+      afterShow = obj;
+    }
+  });
+  var obj = $wrap.data('plugin_underlayerSlide');
+
+  assert.ok(!beforeShow);
+  assert.ok(!afterShow);
+  obj.show();
+  assert.deepEqual(beforeShow.class, 'UnderlayerSlide');
+  assert.deepEqual(afterShow.class, 'UnderlayerSlide');
+});
+
 QUnit.test("Passing custom show/hide functions trigger them instead of defaults.", function(assert) {
   var $wrap   = $('.example-wrapper');
   var $toggle = $('.example-toggle');

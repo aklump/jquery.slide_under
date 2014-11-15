@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Demo of jquery.underlayer_slide.js</title>
-  <script src="externs/jquery-1.4.4.min.js"></script>
+  <script src="externs/jquery.min.js"></script>
   <script src="jquery.underlayer_slide.js"></script>
   <style type="text/css" media="all">
     @import url("css/bootstrap.min.css");
@@ -13,10 +13,10 @@
   (function($) {
     $('document').ready(function(){
       
-      $('.example-wrapper').underlayerSlide(
+      $('.example-wrapper').underlayerSlide({
         "toggle": '.example-toggle',
         "under": '.example-underlayer'
-      );
+      });
 
     });
   })(jQuery);
