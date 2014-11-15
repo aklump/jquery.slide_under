@@ -1,0 +1,5 @@
+name = "Underlayer Slide"
+description = "Plugin to register an under layer that slides out from under a container when triggered."
+homepage = http://www.intheloftstudios.com/packages/jquery/jquery.underlayer_slide
+version = "1.0"
+author = Aaron Klump <sourcecode@intheloftstudios.com>
