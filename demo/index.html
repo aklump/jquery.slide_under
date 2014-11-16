@@ -19,6 +19,16 @@
         $('.slide-down-underlayer').slideToggle(speed);
       })
 
+      $("#a-bottom-layer").underlayerSlide("#a-top-layer");
+      $('#a-show').click(function () {
+        $("#a-bottom-layer").underlayerSlide('show');
+        return false;
+      })
+      $('#a-hide').click(function () {
+        $("#a-bottom-layer").underlayerSlide('hide');
+        return false;
+      })
+
       
       $('.under').underlayerSlide({
         "toggle": '.toggle',
@@ -80,7 +90,34 @@
       </div>      
     </div> -->
 
-    <h2>Example</h2>
+    <h2>Example One</h2>
+    
+    <p class="lead">Instantiate with selector as argument and use explicit form of the hide/show to trigger the slide.</p>
+
+    <a href="#" id="a-show">Show</a>
+    <a href="#" id="a-hide">Hide</a>
+    <img src="images/eiffel-tower.jpg" id="a-bottom-layer"/>
+    <div class="over" id="a-top-layer">Overlayer</div>
+
+    <h3>Html</h3>
+    <pre>&lt;a href="#" id="a-show">Show&lt;/a>
+&lt;a href="#" id="a-hide">Hide&lt;/a>
+&ltimg src="images/eiffel-tower.jpg" id="a-bottom-layer"/>
+&lt;div id="a-top-layer">Overlayer&lt;/div></pre>
+
+    <h3>Javascript</h3>
+    <pre>$("#a-bottom-layer").underlayerSlide("#a-top-layer");
+$('#a-show').click(function () {
+  $("#a-bottom-layer").underlayerSlide('show');
+  return false;
+})
+$('#a-hide').click(function () {
+  $("#a-bottom-layer").underlayerSlide('hide');
+  return false;
+})</pre>
+
+    <h2>Example Two</h2>
+    <p class="lead">Use the toggle option and allow plugin to handle hide/show methods automatically.</p>
 
     <h3>Markup</h3>
 

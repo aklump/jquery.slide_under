@@ -64,15 +64,16 @@ UnderlayerSlide.prototype.init = function () {
   dimensions[0]     = self.$over.outerWidth();
   dimensions[1]     = self.$over.outerHeight();
 
-  var $shim = $('<div>')
-  .addClass(p + 'shim')
-  .width(dimensions[0])
-  .height(dimensions[1]);
-  self.$over.addClass(p + 'over');
+  if (self.options.shim) {
+    var $shim = $('<div>')
+    .addClass(p + 'shim')
+    .width(dimensions[0])
+    .height(dimensions[1]);
+    self.$over.addClass(p + 'over');    
+  };
 
   self.$under       = $(self.element);
   self.styles.under  = self.$under.attr('style');
-
   dimensions[2]     = self.$under.outerHeight();
   self.$under
   .addClass(p + 'under ' + p + 'processed');
@@ -90,14 +91,14 @@ UnderlayerSlide.prototype.init = function () {
 
   // This shim will hold the place of options.under when it goes to absolute
   // positioning.
-  if (self.$over.parent().siblings('.' + p + 'shim').length ===0) {
+  if (self.options.shim && self.$over.parent().siblings('.' + p + 'shim').length ===0) {
     self.$over.parent().after($shim);  
   }
 
   // The distance needed to travel during expose/hide op.
-  self.travel     = self.$under.outerHeight();
-  self.home       = self.$over.outerHeight();
-  self.speed      = self.options.speed * self.travel / 100;
+  self.travelFrom = dimensions[2] * -1 + dimensions[1];
+  self.travelTo   = dimensions[1];
+  self.speed      = self.options.speed * Math.abs(self.travelFrom) / 100;
   
   // Callbacks
   if (typeof self.options.preset.afterInit === 'function') {
@@ -121,7 +122,7 @@ UnderlayerSlide.prototype.destroy = function () {
 
   self.$over
   .removeClass(p + 'over')
-  .removeData('plugin_underlayerSlide')
+  .removeData('underlayerSlide')
   .attr('style', self.styles.over);
   if (self.styles.over) {
     self.$over.attr('style', self.styles.over);
@@ -144,14 +145,22 @@ UnderlayerSlide.prototype.destroy = function () {
   
 };
 
-UnderlayerSlide.prototype.toggle = function() {
+UnderlayerSlide.prototype.isVisible = function() {
   var p         = this.options.cssPrefix;
-  var visible   = this.$under.hasClass(p + 'visible');
-  return visible ? this.hide() : this.show();
+  return this.$under.hasClass(p + 'showing') || this.$under.hasClass(p + 'visible');
+};
+
+UnderlayerSlide.prototype.toggle = function() {
+  return this.isVisible() ? this.hide() : this.show();
 };
 
 UnderlayerSlide.prototype.show = function() {
   var self      = this;
+
+  if (self.$under.is(':animated') || self.isVisible()) {
+    return self;
+  }
+
   var p         = this.options.cssPrefix;
 
   self.options.beforeShow(self.$under, self);
@@ -172,6 +181,11 @@ UnderlayerSlide.prototype.show = function() {
 
 UnderlayerSlide.prototype.hide = function() {
   var self      = this;
+
+  if (self.$under.is(':animated') || !self.isVisible()) {
+    return self;
+  }
+
   var p         = self.options.cssPrefix;
 
   self.options.beforeHide(self.$under, self);
@@ -216,7 +230,7 @@ presets.down = {};
  */
 presets.down.afterInit = function (instance) {
   instance.$under
-  .css('top', -1 * instance.travel)
+  .css('top', instance.travelFrom)
   .hide();
 };
 
@@ -232,7 +246,7 @@ presets.down.show = function (instance, callback) {
   instance.$under
   .show()
   .animate({
-    "top": instance.home,
+    "top": instance.travelTo,
   }, instance.speed, callback);
 };
 
@@ -246,7 +260,7 @@ presets.down.show = function (instance, callback) {
  */
  presets.down.hide = function (instance, callback) {
   instance.$under.animate({
-    "top": -1 * instance.travel,
+    "top": instance.travelFrom,
   }, instance.speed, function () {
     instance.$under.hide();
     callback();
@@ -256,14 +270,19 @@ presets.down.show = function (instance, callback) {
 
 $.fn.underlayerSlide = function(options) {
   return this.each(function () {
-    if (options === 'destroy') {
-      var obj = $.data(this, 'plugin_underlayerSlide');
-      if (obj && typeof obj.destroy !== 'undefined') {
-        obj.destroy();
-      }
+    var obj = $.data(this, 'underlayerSlide');
+
+    // Sniff out a string method.
+    if (typeof options === 'string' && obj && typeof obj[options] === 'function') {
+      obj[options]();
     }
     else {
-      $.data(this, 'plugin_underlayerSlide', new UnderlayerSlide(this, options));  
+      // If it's a string and it's not a method, it's a jQuery selector.
+      if (typeof options === 'string') {
+        options = {"over": options};
+      }
+
+      $.data(this, 'underlayerSlide', new UnderlayerSlide(this, options));    
     }
   });
 };
@@ -334,6 +353,13 @@ $.fn.underlayerSlide.defaults = {
    * @var function
    */  
   "afterHide"         : function(layer, instance) {},
+
+  /**
+   * Determines if a shim element is created.
+   *
+   * @var bool
+   */
+  "shim"              : true,
   
   /**
    * Defines the css prefix to use for all classes applied by plugin.

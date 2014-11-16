@@ -1,3 +1,69 @@
+QUnit.test("Passing shim = false prevents the dom object from being created.", function(assert) {
+  var top      = '.top-layer';
+  var bottom   = '.bottom-layer';
+  $(bottom).underlayerSlide({
+    shim: false,
+    over: top
+  });
+  assert.deepEqual($('.uls-shim').length, 0);
+});
+
+QUnit.test("Passing a jQuery selector as options converts it to the over option.", function(assert) {
+  var top      = '.top-layer';
+  var bottom   = '.bottom-layer';
+  $(bottom).underlayerSlide(top);
+  var obj = $(bottom).data('underlayerSlide');
+
+  assert.ok($(top).hasClass('uls-over'));
+
+});
+
+QUnit.test("Underlayer is position correctly on init.", function(assert) {
+  var top      = '.top-layer';
+  var bottom   = '.bottom-layer';
+  $(top).height(100);
+  $(bottom).height(300);
+  $(bottom).underlayerSlide({
+    "over": top,
+  });
+
+  assert.deepEqual($(bottom).css('top'), '-200px');
+
+  $(top).height(100);
+  $(bottom).height(200);
+  $(bottom).underlayerSlide('destroy');  
+});
+
+QUnit.test("Calling with 'hide' or 'show' shows performs the corresponding methods.", function(assert) {
+  var top      = '.top-layer';
+  var bottom   = '.bottom-layer';
+  $(bottom).underlayerSlide({
+    "over": top,
+
+    // Custom preset to avoid the delay from the default animation.
+    "preset": {
+      "hide": function (instance, callback) {
+        callback();
+      },
+      "show": function (instance, callback) {
+        callback();
+      }
+    }
+  });
+
+  var obj = $(bottom).data('underlayerSlide');
+  
+  assert.ok(!$(bottom).hasClass('uls-visible'));
+  assert.ok(!obj.isVisible());
+  $(bottom).underlayerSlide('show');
+  assert.ok($(bottom).hasClass('uls-visible'));
+  assert.ok(obj.isVisible());
+
+  $(bottom).underlayerSlide('hide');
+  assert.ok(!$(bottom).hasClass('uls-visible'));
+  assert.ok(!obj.isVisible());
+});
+
 QUnit.test("Speed calculates correctly", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
@@ -10,9 +76,9 @@ QUnit.test("Speed calculates correctly", function(assert) {
     "toggle": toggle,
     "speed": 100,
   });
-  var obj = $(bottom).data('plugin_underlayerSlide');
+  var obj = $(bottom).data('underlayerSlide');
 
-  assert.deepEqual(obj.speed, 200);
+  assert.deepEqual(obj.speed, 100);
   $(bottom).underlayerSlide('destroy');
   $(top).add($(bottom)).removeAttr('style');
 });
@@ -82,7 +148,7 @@ QUnit.test("Custom preset fires all callbacks", function(assert) {
       }
     }
   });
-  var obj = $(bottom).data('plugin_underlayerSlide');
+  var obj = $(bottom).data('underlayerSlide');
 
   assert.deepEqual(result.afterInit.class, 'UnderlayerSlide');
   
