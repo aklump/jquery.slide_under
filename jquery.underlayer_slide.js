@@ -1,6 +1,6 @@
 /**
  * Underlayer Slide jQuery JavaScript Plugin v0.0.1
- * http://www.intheloftstudios.com/packages/jquery/jquery.underlayer_slide
+ * http://www.intheloftstudios.com/packages/jquery/jquery.under_slide
  *
  * Plugin to register an under layer that slides out from under a container when triggered.
  *
@@ -11,8 +11,8 @@
  *
  * Helper css classes applied by this plugin (all are prefixed):
  *
- * On the underlayer element:
- * - underlayer
+ * On the under element:
+ * - under
  * - visible
  * - showing
  * - hiding
@@ -30,26 +30,10 @@
 ;(function($, window, document, undefined) {
 "use strict";
 
-var underlayer = {};
-underlayer.css = {};
-underlayer.css.hidden = {
-  "position": "absolute",
-  "bottom": 0,
-  "display": "none"
-};
-underlayer.css.visible = {
-  "position": "static",
-  "display": "block",
-};
-underlayer.style = '';
-
 // The actual plugin constructor
 function UnderlayerSlide(element, options) {
   this.class      = 'UnderlayerSlide';
   this.element    = element;
-  this.$wrapper   = $(element);
-  this.$toggle    = $(options.toggle);
-  this.$under     = $(options.under);
   this.options    = $.extend( {}, $.fn.underlayerSlide.defaults, options) ;
   this._defaults  = $.fn.underlayerSlide.defaults;
   
@@ -61,53 +45,103 @@ UnderlayerSlide.prototype.toString = function() {
 };
 
 UnderlayerSlide.prototype.init = function () {
-  // Place initialization logic here
-  // You already have access to the DOM element and
-  // the options via the instance, e.g. this.element 
-  // and this.options
-  var obj = this;
-  var p   = this.options.cssPrefix;
-
-  $(obj.element)
-  .addClass(p + 'wrapper ' + p + 'processed');
-
-  this.$toggle
+  var self          = this;
+  var p             = self.options.cssPrefix;
+  var dimensions    = [];
+  
+  self.styles       = {};
+  
+  self.$toggle      = $(self.options.toggle);
+  self.$toggle
   .addClass(p + 'toggle')
   .removeClass(p + 'active')
   .click(function () {
-    obj.toggle();
+    self.toggle();
   });
 
-  // Capture the original style attribute value destroy method.
-  underlayer.style = this.$under.attr('style');
+  self.$over        = $(self.options.over);
+  self.styles.over  = self.$over.attr('style');
+  dimensions[0]     = self.$over.outerWidth();
+  dimensions[1]     = self.$over.outerHeight();
 
-  this.$under
-  .addClass(p + 'underlayer')
-  .removeClass(p + 'visible')
-  .css(underlayer.css.hidden);
+  var $shim = $('<div>')
+  .addClass(p + 'shim')
+  .width(dimensions[0])
+  .height(dimensions[1]);
+  self.$over.addClass(p + 'over');
+
+  self.$under       = $(self.element);
+  self.styles.under  = self.$under.attr('style');
+
+  dimensions[2]     = self.$under.outerHeight();
+  self.$under
+  .addClass(p + 'under ' + p + 'processed');
+
+  if (self.$over.parent('.' + p + 'container').length === 0) {
+    var $container = $('<div>')
+    .addClass(p + 'container')
+    .width(dimensions[0])
+    .height(dimensions[1] + dimensions[2]);
+    self.$over.add(self.$under).wrapAll($container);  
+  }
+  else {
+    self.$over.parent('.' + p + 'container').prepend(self.$under);
+  }
+
+  // This shim will hold the place of options.under when it goes to absolute
+  // positioning.
+  if (self.$over.parent().siblings('.' + p + 'shim').length ===0) {
+    self.$over.parent().after($shim);  
+  }
+
+  // The distance needed to travel during expose/hide op.
+  self.travel     = self.$under.outerHeight();
+  self.home       = self.$over.outerHeight();
+  self.speed      = self.options.speed * self.travel / 100;
+  
+  // Callbacks
+  if (typeof self.options.preset.afterInit === 'function') {
+    self.options.preset.afterInit(self);
+  }
+  self.options.afterInit(self);
+
 };
 
 UnderlayerSlide.prototype.destroy = function () {
-  var p = this.options.cssPrefix;
-  this.$wrapper
-  .removeClass(p + 'wrapper')
-  .removeClass(p + 'processed')
-  .removeData('plugin_underlayerSlide');
+  var self = this;
+  var p = self.options.cssPrefix;
 
-  this.$toggle
+  self.$toggle
   .removeClass(p + 'toggle ' + p + 'active')
   .unbind('click');
 
-  this.$under
-  .removeData(p + 'style')
-  .removeClass(p + 'underlayer ' + p + 'visible');
+  // Remove the container and shim elements.
+  self.$over.parent('.' + p + 'container').siblings('.' + p + 'shim').remove();
+  self.$over.unwrap();
 
-  if (typeof underlayer.style === 'undefined') {
-    this.$under.removeAttr('style');
+  self.$over
+  .removeClass(p + 'over')
+  .removeData('plugin_underlayerSlide')
+  .attr('style', self.styles.over);
+  if (self.styles.over) {
+    self.$over.attr('style', self.styles.over);
   }
   else {
-    this.$under.attr('style', underlayer.style);  
+    self.$over.removeAttr('style');
   }
+  
+  self.$under
+  .removeData(p + 'style')
+  .removeClass(p + 'under')
+  .removeClass(p + 'visible')
+  .removeClass(p + 'processed');
+  if (self.styles.under) {
+    self.$under.attr('style', self.styles.under);
+  }
+  else {
+    self.$under.removeAttr('style');
+  }
+  
 };
 
 UnderlayerSlide.prototype.toggle = function() {
@@ -120,31 +154,17 @@ UnderlayerSlide.prototype.show = function() {
   var self      = this;
   var p         = this.options.cssPrefix;
 
-  self.options.beforeShow(self);
+  self.options.beforeShow(self.$under, self);
   self.$toggle.addClass(p + 'active');
   self.$under.addClass(p + 'showing');
 
-  /**
-   * A function that should be called when showing has completed.
-   *
-   * @var function
-   */
-  var callback = function () {
-    self.$under
-    .addClass(p + 'visible')
-    .removeClass(p + 'showing');
-    self.options.afterShow(self);
-  }
-
-  // Custom show function.
-  if (typeof self.options.show === "function") {
-    return self.options.show(self, callback);
-  }
-
-  // The default showing.
-  else {
-    self.$under.css(underlayer.css.visible);
-    callback();
+  if (typeof self.options.preset.show === 'function') {
+    self.options.preset.show(self, function () {
+      self.$under
+      .addClass(p + 'visible')
+      .removeClass(p + 'showing');
+      self.options.afterShow(self.$under, self);
+    });
   }
 
   return self;
@@ -154,35 +174,85 @@ UnderlayerSlide.prototype.hide = function() {
   var self      = this;
   var p         = self.options.cssPrefix;
 
-  self.options.beforeHide(self);
+  self.options.beforeHide(self.$under, self);
   self.$toggle.removeClass(p + 'active');
   self.$under.addClass(p + 'hiding');
 
-  /**
-   * A function that should be called when showing has completed.
-   *
-   * @var function
-   */
-  var callback = function () {
-    self.$under
-    .removeClass(p + 'visible')
-    .removeClass(p + 'hiding');
-    self.options.afterHide(self);
-  };
-
-  // Custom hide function.
-  if (typeof self.options.hide === "function") {
-    return self.options.hide(self, callback);
-  }
-
-  // The default showing.
-  else {
-    self.$under.css(underlayer.css.hidden);
-    callback();
+  if (typeof self.options.preset.hide === "function") {
+    return self.options.preset.hide(self, function () {
+      self.$under
+      .removeClass(p + 'visible')
+      .removeClass(p + 'hiding');
+      self.options.afterHide(self.$under, self);
+    });
   }
 
   return self;
 };
+
+
+
+
+/**
+ * Defines one or more presets to use for animation.
+ *
+ * @var object
+ */
+var presets = {};
+
+/**
+ * This preset is used for revealing as if sliding downward.
+ *
+ * @type {Object}
+ */
+presets.down = {};
+
+/**
+ * Defines the preset callback post initialization.
+ *
+ * This should be used to hide the underlayer initially.
+ *
+ * @var function
+ */
+presets.down.afterInit = function (instance) {
+  instance.$under
+  .css('top', -1 * instance.travel)
+  .hide();
+};
+
+/**
+ * Defines the function to be usedfor EXPOSING the underlayer.
+ *
+ * You MUST execute the callback at some point when using this feature or bad
+ * things will happen (css classes will not be applied correctly).
+ *
+ * @var function
+ */
+presets.down.show = function (instance, callback) {
+  instance.$under
+  .show()
+  .animate({
+    "top": instance.home,
+  }, instance.speed, callback);
+};
+
+/**
+ * Defines the function to be used for HIDING the underlayer.
+ *
+ * You MUST execute the callback at some point when using this feature or bad
+ * things will happen (css classes will not be applied correctly).
+ * 
+ * @var function
+ */
+ presets.down.hide = function (instance, callback) {
+  instance.$under.animate({
+    "top": -1 * instance.travel,
+  }, instance.speed, function () {
+    instance.$under.hide();
+    callback();
+  });
+};
+
 
 $.fn.underlayerSlide = function(options) {
   return this.each(function () {
@@ -208,71 +278,68 @@ $.fn.underlayerSlide.defaults = {
   "toggle"            : null,
 
   /**
-   * Defines the selector for the underlayer element.
+   * Defines the selector for the element under which we'll slide.
    *
    * @var string
    */
-  "under"             : null,
+  "over"             : null,
   
   /**
-   * Defines the direction the underlayer will travel when exposed.
+   * Defines the preset to use for animation.
    *
    * Valid options are: down. 
    *
    * @var type
    */
-  "direction"         : "down",
+  "preset"         : presets.down,
+
+  /**
+   * Define how many milliseconds to travel 100px.
+   *
+   * @var int
+   */
+  "speed"             : 200,
+
+  /**
+   * A callback function to call before initializing.
+   *
+   * @var function
+   */
+  "afterInit"        : function (instance) {},
 
   /**
    * A function to call before the showing begins.
    *
    * @var function
    */
-  "beforeShow"        : function(instance) {},
+  "beforeShow"        : function(layer, instance) {},
 
   /**
    * A function to call AFTER the showing has completed.
    *
    * @var function
    */
-  "afterShow"         : function(instance) {},
-
-  /**
-   * Defines a custom function to be used instead of the default for EXPOSING
-   * the underlayer.
-   *
-   * Receives the UnderlayerSlide object and a function to apply after the
-   * exposition has completed.  You MUST call that second function at some
-   * point when using this feature.
-   *
-   * @var function
-   */
-  "show"              : null,
+  "afterShow"         : function(layer, instance) {},
 
   /**
    * A function to call before the hiding begins.
    *
    * @var function
    */
-  "beforeHide"        : function(instance) {},
+  "beforeHide"        : function(layer, instance) {},
 
   /**
    * A function to call AFTER the hiding has completed.
    *
    * @var function
    */  
-  "afterHide"         : function(instance) {},
-
-  /**
-   * Defines a custom function to be used instead of the default for HIDING
-   * the underlayer.
-   *
-   * @var function
-   */  
-  "hide"              : null,
+  "afterHide"         : function(layer, instance) {},
   
   /**
    * Defines the css prefix to use for all classes applied by plugin.
+   *
+   * If you change this you may need to clone any included stylesheets, 
+   * replacing the default classnames with your custom.
    *
    * @var string
    */

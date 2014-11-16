@@ -12,10 +12,21 @@
   <script>
   (function($) {
     $('document').ready(function(){
+
+      var speed = 300;
+
+      $('.slide-down-toggle').click(function () {
+        $('.slide-down-underlayer').slideToggle(speed);
+      })
+
       
-      $('.example-wrapper').underlayerSlide({
-        "toggle": '.example-toggle',
-        "under": '.example-underlayer'
+      $('.under').underlayerSlide({
+        "toggle": '.toggle',
+        "over": '.over',
+      });
+      $('.under2').underlayerSlide({
+        "toggle": '.toggle2',
+        "over": '.over',
       });
 
     });
@@ -58,16 +69,48 @@
       <li>See also <a href="demo.html">Demo</a></li>
     </ol>
     <hr />
+
+<!--     <h2>Example $.slideDown()</h2>
     
-    <h2>Example</h2>
-    
-    <div class="example">
-      <div class="example-toggle">Wrapper>Trigger</div>
+    <div class="slide-down">
+      <div class="slide-down-toggle">Wrapper>Trigger</div>
       
-      <div class="example-wrapper">Wrapper
-        <div class="example-underlayer">Wrapper>Underlayer</div>
+      <div class="slide-down-wrapper">Wrapper
+        <img src="images/eiffel-tower.jpg" alt="Eiffel Tower" class="slide-down-underlayer"/>
       </div>      
-    </div>
+    </div> -->
+
+    <h2>Example</h2>
+
+    <h3>Markup</h3>
+
+    <pre>&lt;!-- This element is used to toggle display-->
+&lt;div class="toggle">Show/Hide&lt;/div> 
+
+&lt;!-- The underlayer element should come first and will appear to slide out from
+under the element that comes second. -->
+&lt;img src="images/eiffel-tower.jpg" class="bottom-layer"/>
+&lt;div class="top-layer">Overlayer&lt;/div></pre>
+    
+    <h3>Javascript</h3>
+    <pre>
+$(".bottom-layer").underlayerSlide({
+  "over": ".over-layer",
+  "toggle": ".toggle"
+});
+    </pre>
+
+        
+        <button class="btn btn-info toggle2">Simple toggle</button>
+        <div class="toggle">
+          <button class="btn btn-success toggle-show">Click to reveal the hidden layer</button>
+          <button class="btn btn-danger toggle-hide">Click to retract the layer</button>
+        </div>
+
+        <img src="images/space-needle.jpg" alt="Space Needle" class="under2"/>
+        <img src="images/eiffel-tower.jpg" alt="Eiffel Tower" class="under"/>
+        <div class="over">Top Layer</div>
+        <!-- <div class="example-overlayer uls-overlayer">Overlayer</div> -->
 
     <!-- Add your markup for the example here -->
     <hr />
