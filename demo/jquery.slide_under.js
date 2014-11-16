@@ -2,12 +2,12 @@
  * Underlayer Slide jQuery JavaScript Plugin v0.0.1
  * http://www.intheloftstudios.com/packages/jquery/jquery.slide_under
  *
- * Plugin to register an under layer that slides out from under a container when triggered.
+ * jQuery plugin to simulate one element sliding under another without lose of dimensions.
  *
  * Copyright 2013, Aaron Klump
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Sun Nov 16 09:09:24 PST 2014
+ * Date: Sun Nov 16 09:26:18 PST 2014
  *
  * Helper css classes applied by this plugin (all are prefixed):
  *
@@ -47,8 +47,7 @@ SlideUnder.prototype.toString = function() {
 SlideUnder.prototype.init = function () {
   var self          = this;
   var p             = self.options.cssPrefix;
-  var dimensions    = [];
-  
+  self.dimensions   = [];
   self.styles       = {};
   
   //
@@ -65,55 +64,56 @@ SlideUnder.prototype.init = function () {
   // Overlayer
   self.$over        = $(self.options.over);
   self.styles.over  = self.$over.attr('style');
-  dimensions[0]     = self.$over.outerWidth();
-  dimensions[1]     = self.$over.outerHeight();
+  self.dimensions[0]     = self.$over.outerWidth();
+  self.dimensions[1]     = self.$over.outerHeight();
   self.$over.addClass(p + 'over');
 
   //
   // Shim element
-  self.$shim        = $();
   var $shim;
   if (self.options.shim) {
     $shim = $('<div>')
     .addClass(p + 'shim')
-    .width(dimensions[0])
-    .height(dimensions[1]);
+    .width(self.dimensions[0])
+    .height(self.dimensions[1]);
   }
 
   //
   // Underlayer
   self.$under       = $(self.element);
   self.styles.under = self.$under.attr('style');
-  dimensions[2]     = self.$under.outerHeight();
+  self.dimensions[2]     = self.$under.outerHeight();
   self.$under
   .addClass(p + 'under ' + p + 'processed');
 
   //
   // Container
-  if (self.$over.parent('.' + p + 'container').length === 0) {
-    self.$container = $('<div>')
-    .addClass(p + 'container')
-    .width(dimensions[0])
-    .height(dimensions[1] + dimensions[2]);
-    self.$over.add(self.$under).wrapAll(self.$container);  
+  self.$container   = self.$over.parent('.' + p + 'container');
+  if (self.$container.length === 0) {
+    self.$over.add(self.$under).wrapAll($('<div>').addClass(p + 'container'));  
+    self.$container = self.$over.parent('.' + p + 'container');
   }
   else {
-    self.$over.parent('.' + p + 'container').prepend(self.$under);
+    self.$container.prepend(self.$under);
   }
-  self.$container = self.$over.parent('.' + p + 'container');
+
+  // Add the correct container dimensions.
+  self.$container
+  .width(self.dimensions[0])
+  .height(self.dimensions[1] + self.dimensions[2]);
 
   // This shim will hold the place of options.under when it goes to absolute
   // positioning.
-  // if (self.options.shim && self.$over.parent().siblings('.' + p + 'shim').length === 0) {
+  self.$shim        = $();
   if (self.options.shim && self.$container.next('.' + p + 'shim').length === 0) {
     self.$over.parent().after($shim);
     self.$shim = $shim;
   }
 
   // The distance needed to travel during expose/hide op.
-  self.travelFrom = dimensions[2] * -1 + dimensions[1];
-  self.travelTo   = dimensions[1];
-  self.speed      = self.options.speed * Math.abs(self.travelFrom) / 100;
+  self.travelFrom   = self.dimensions[2] * -1 + self.dimensions[1];
+  self.travelTo     = self.dimensions[1];
+  self.speed        = self.options.speed * Math.abs(self.travelFrom) / 100;
   
   // Callbacks
   if (typeof self.options.preset.afterInit === 'function') {
@@ -132,7 +132,6 @@ SlideUnder.prototype.destroy = function () {
   .unbind('click');
 
   // Remove the container and shim elements.
-  // self.$over.parent('.' + p + 'container').siblings('.' + p + 'shim').remove();
   self.$shim.remove();
   self.$over.unwrap();
 
@@ -277,6 +276,33 @@ presets.down.show = function (instance, callback) {
  presets.down.hide = function (instance, callback) {
   instance.$under.animate({
     "top": instance.travelFrom,
+  }, instance.speed, function () {
+    instance.$under.hide();
+    callback();
+  });
+};
+
+/**
+ * This preset is used for revealing as if sliding downward.
+ *
+ * @type {Object}
+ */
+presets.up = {};
+presets.up.afterInit = function (instance) {
+  instance.$under
+  .css('bottom', instance.travelFrom)
+  .hide();
+};
+presets.up.show = function (instance, callback) {
+  instance.$under
+  .show()
+  .animate({
+    "bottom": instance.travelTo,
+  }, instance.speed, callback);
+};
+presets.up.hide = function (instance, callback) {
+  instance.$under.animate({
+    "bottom": instance.travelFrom,
   }, instance.speed, function () {
     instance.$under.hide();
     callback();
