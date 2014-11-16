@@ -71,7 +71,6 @@ SlideUnder.prototype.init = function () {
 
   //
   // Shim element
-  self.$shim        = $();
   var $shim;
   if (self.options.shim) {
     $shim = $('<div>')
@@ -100,20 +99,20 @@ SlideUnder.prototype.init = function () {
   else {
     self.$over.parent('.' + p + 'container').prepend(self.$under);
   }
-  self.$container = self.$over.parent('.' + p + 'container');
+  self.$container   = self.$over.parent('.' + p + 'container');
 
   // This shim will hold the place of options.under when it goes to absolute
   // positioning.
-  // if (self.options.shim && self.$over.parent().siblings('.' + p + 'shim').length === 0) {
+  self.$shim        = $();
   if (self.options.shim && self.$container.next('.' + p + 'shim').length === 0) {
     self.$over.parent().after($shim);
     self.$shim = $shim;
   }
 
   // The distance needed to travel during expose/hide op.
-  self.travelFrom = dimensions[2] * -1 + dimensions[1];
-  self.travelTo   = dimensions[1];
-  self.speed      = self.options.speed * Math.abs(self.travelFrom) / 100;
+  self.travelFrom   = dimensions[2] * -1 + dimensions[1];
+  self.travelTo     = dimensions[1];
+  self.speed        = self.options.speed * Math.abs(self.travelFrom) / 100;
   
   // Callbacks
   if (typeof self.options.preset.afterInit === 'function') {
@@ -132,7 +131,6 @@ SlideUnder.prototype.destroy = function () {
   .unbind('click');
 
   // Remove the container and shim elements.
-  // self.$over.parent('.' + p + 'container').siblings('.' + p + 'shim').remove();
   self.$shim.remove();
   self.$over.unwrap();
 
