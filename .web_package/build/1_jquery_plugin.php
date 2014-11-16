@@ -39,7 +39,7 @@ list(
 ) = $argv;
 
 // Get the source file of the jquery plugin.
-$source_file = $path_to_root . '/jquery.underlayer_slide.js';
+$source_file = $path_to_root . '/jquery.slide_under.js';
 $source = file_get_contents($source_file);
 
 // Pull out only comment lines for manipulation to protect code.
