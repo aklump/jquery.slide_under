@@ -1,13 +1,13 @@
 /**
  * Underlayer Slide jQuery JavaScript Plugin v0.0.1
- * http://www.intheloftstudios.com/packages/jquery/jquery.under_slide
+ * http://www.intheloftstudios.com/packages/jquery/jquery.slide_under
  *
  * Plugin to register an under layer that slides out from under a container when triggered.
  *
  * Copyright 2013, Aaron Klump
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Sat Nov 15 08:57:11 PST 2014
+ * Date: Sun Nov 16 08:09:34 PST 2014
  *
  * Helper css classes applied by this plugin (all are prefixed):
  *
@@ -31,20 +31,20 @@
 "use strict";
 
 // The actual plugin constructor
-function UnderlayerSlide(element, options) {
-  this.class      = 'UnderlayerSlide';
+function SlideUnder(element, options) {
+  this.class      = 'SlideUnder';
   this.element    = element;
-  this.options    = $.extend( {}, $.fn.underlayerSlide.defaults, options) ;
-  this._defaults  = $.fn.underlayerSlide.defaults;
+  this.options    = $.extend( {}, $.fn.slideUnder.defaults, options) ;
+  this._defaults  = $.fn.slideUnder.defaults;
   
   this.init();
 }
 
-UnderlayerSlide.prototype.toString = function() {
+SlideUnder.prototype.toString = function() {
   return this.class;
 };
 
-UnderlayerSlide.prototype.init = function () {
+SlideUnder.prototype.init = function () {
   var self          = this;
   var p             = self.options.cssPrefix;
   var dimensions    = [];
@@ -108,7 +108,7 @@ UnderlayerSlide.prototype.init = function () {
 
 };
 
-UnderlayerSlide.prototype.destroy = function () {
+SlideUnder.prototype.destroy = function () {
   var self = this;
   var p = self.options.cssPrefix;
 
@@ -122,7 +122,7 @@ UnderlayerSlide.prototype.destroy = function () {
 
   self.$over
   .removeClass(p + 'over')
-  .removeData('underlayerSlide')
+  .removeData('slideUnder')
   .attr('style', self.styles.over);
   if (self.styles.over) {
     self.$over.attr('style', self.styles.over);
@@ -145,16 +145,16 @@ UnderlayerSlide.prototype.destroy = function () {
   
 };
 
-UnderlayerSlide.prototype.isVisible = function() {
+SlideUnder.prototype.isVisible = function() {
   var p         = this.options.cssPrefix;
   return this.$under.hasClass(p + 'showing') || this.$under.hasClass(p + 'visible');
 };
 
-UnderlayerSlide.prototype.toggle = function() {
+SlideUnder.prototype.toggle = function() {
   return this.isVisible() ? this.hide() : this.show();
 };
 
-UnderlayerSlide.prototype.show = function() {
+SlideUnder.prototype.show = function() {
   var self      = this;
 
   if (self.$under.is(':animated') || self.isVisible()) {
@@ -179,7 +179,7 @@ UnderlayerSlide.prototype.show = function() {
   return self;
 };
 
-UnderlayerSlide.prototype.hide = function() {
+SlideUnder.prototype.hide = function() {
   var self      = this;
 
   if (self.$under.is(':animated') || !self.isVisible()) {
@@ -268,9 +268,9 @@ presets.down.show = function (instance, callback) {
 };
 
 
-$.fn.underlayerSlide = function(options) {
+$.fn.slideUnder = function(options) {
   return this.each(function () {
-    var obj = $.data(this, 'underlayerSlide');
+    var obj = $.data(this, 'slideUnder');
 
     // Sniff out a string method.
     if (typeof options === 'string' && obj && typeof obj[options] === 'function') {
@@ -282,12 +282,12 @@ $.fn.underlayerSlide = function(options) {
         options = {"over": options};
       }
 
-      $.data(this, 'underlayerSlide', new UnderlayerSlide(this, options));    
+      $.data(this, 'slideUnder', new SlideUnder(this, options));    
     }
   });
 };
 
-$.fn.underlayerSlide.defaults = {
+$.fn.slideUnder.defaults = {
   
   /**
    * Defines the selector for the toggle element.
@@ -377,6 +377,6 @@ $.fn.underlayerSlide.defaults = {
  *
  * @return {string}
  */
-$.fn.underlayerSlide.version = function() { return '0.0.1'; };
+$.fn.slideUnder.version = function() { return '0.0.1'; };
 
 })(jQuery, window, document);
