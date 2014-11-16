@@ -1,12 +1,12 @@
-.uls-toggle {
+.slide-under-toggle {
   cursor: pointer;
 }
-.uls-container {
+.slide-under-container {
   position: absolute;
   z-index: 1;
   overflow: hidden;
 }
-.uls-over,
-.uls-under {
+.slide-under-over,
+.slide-under-under {
   position: absolute;
 }

@@ -7,7 +7,7 @@
  * Copyright 2013, Aaron Klump
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Sun Nov 16 08:09:34 PST 2014
+ * Date: Sun Nov 16 09:09:24 PST 2014
  *
  * Helper css classes applied by this plugin (all are prefixed):
  *
@@ -51,6 +51,8 @@ SlideUnder.prototype.init = function () {
   
   self.styles       = {};
   
+  //
+  // Toggle
   self.$toggle      = $(self.options.toggle);
   self.$toggle
   .addClass(p + 'toggle')
@@ -59,40 +61,53 @@ SlideUnder.prototype.init = function () {
     self.toggle();
   });
 
+  // 
+  // Overlayer
   self.$over        = $(self.options.over);
   self.styles.over  = self.$over.attr('style');
   dimensions[0]     = self.$over.outerWidth();
   dimensions[1]     = self.$over.outerHeight();
+  self.$over.addClass(p + 'over');
 
+  //
+  // Shim element
+  self.$shim        = $();
+  var $shim;
   if (self.options.shim) {
-    var $shim = $('<div>')
+    $shim = $('<div>')
     .addClass(p + 'shim')
     .width(dimensions[0])
     .height(dimensions[1]);
-    self.$over.addClass(p + 'over');    
-  };
+  }
 
+  //
+  // Underlayer
   self.$under       = $(self.element);
-  self.styles.under  = self.$under.attr('style');
+  self.styles.under = self.$under.attr('style');
   dimensions[2]     = self.$under.outerHeight();
   self.$under
   .addClass(p + 'under ' + p + 'processed');
 
+  //
+  // Container
   if (self.$over.parent('.' + p + 'container').length === 0) {
-    var $container = $('<div>')
+    self.$container = $('<div>')
     .addClass(p + 'container')
     .width(dimensions[0])
     .height(dimensions[1] + dimensions[2]);
-    self.$over.add(self.$under).wrapAll($container);  
+    self.$over.add(self.$under).wrapAll(self.$container);  
   }
   else {
     self.$over.parent('.' + p + 'container').prepend(self.$under);
   }
+  self.$container = self.$over.parent('.' + p + 'container');
 
   // This shim will hold the place of options.under when it goes to absolute
   // positioning.
-  if (self.options.shim && self.$over.parent().siblings('.' + p + 'shim').length ===0) {
-    self.$over.parent().after($shim);  
+  // if (self.options.shim && self.$over.parent().siblings('.' + p + 'shim').length === 0) {
+  if (self.options.shim && self.$container.next('.' + p + 'shim').length === 0) {
+    self.$over.parent().after($shim);
+    self.$shim = $shim;
   }
 
   // The distance needed to travel during expose/hide op.
@@ -117,7 +132,8 @@ SlideUnder.prototype.destroy = function () {
   .unbind('click');
 
   // Remove the container and shim elements.
-  self.$over.parent('.' + p + 'container').siblings('.' + p + 'shim').remove();
+  // self.$over.parent('.' + p + 'container').siblings('.' + p + 'shim').remove();
+  self.$shim.remove();
   self.$over.unwrap();
 
   self.$over
@@ -369,7 +385,7 @@ $.fn.slideUnder.defaults = {
    *
    * @var string
    */
-  "cssPrefix"         : 'uls-'  
+  "cssPrefix"         : 'slide-under-'  
 };
 
 /**

@@ -1,3 +1,12 @@
+QUnit.test("With two instances, two shims are created.", function(assert) {
+  var top      = '.top-layer';
+  var bottom   = '.bottom-layer';
+  $(bottom).slideUnder(top);
+  $('#bottom-2').slideUnder('#top-2');
+
+  assert.deepEqual($('.slide-under-shim').length, 2);
+});
+
 QUnit.test("Passing shim = false prevents the dom object from being created.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
@@ -5,7 +14,7 @@ QUnit.test("Passing shim = false prevents the dom object from being created.", f
     shim: false,
     over: top
   });
-  assert.deepEqual($('.uls-shim').length, 0);
+  assert.deepEqual($('.slide-under-shim').length, 0);
 });
 
 QUnit.test("Passing a jQuery selector as options converts it to the over option.", function(assert) {
@@ -14,7 +23,7 @@ QUnit.test("Passing a jQuery selector as options converts it to the over option.
   $(bottom).slideUnder(top);
   var obj = $(bottom).data('slideUnder');
 
-  assert.ok($(top).hasClass('uls-over'));
+  assert.ok($(top).hasClass('slide-under-over'));
 
 });
 
@@ -53,14 +62,14 @@ QUnit.test("Calling with 'hide' or 'show' shows performs the corresponding metho
 
   var obj = $(bottom).data('slideUnder');
   
-  assert.ok(!$(bottom).hasClass('uls-visible'));
+  assert.ok(!$(bottom).hasClass('slide-under-visible'));
   assert.ok(!obj.isVisible());
   $(bottom).slideUnder('show');
-  assert.ok($(bottom).hasClass('uls-visible'));
+  assert.ok($(bottom).hasClass('slide-under-visible'));
   assert.ok(obj.isVisible());
 
   $(bottom).slideUnder('hide');
-  assert.ok(!$(bottom).hasClass('uls-visible'));
+  assert.ok(!$(bottom).hasClass('slide-under-visible'));
   assert.ok(!obj.isVisible());
 });
 
@@ -83,7 +92,7 @@ QUnit.test("Speed calculates correctly", function(assert) {
   $(top).add($(bottom)).removeAttr('style');
 });
 
-QUnit.test("A second call using a different under element places second under inside .uls-container.", function(assert) {
+QUnit.test("A second call using a different under element places second under inside .slide-under-container.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
   var toggle   = '.toggle';
@@ -97,10 +106,10 @@ QUnit.test("A second call using a different under element places second under in
     "toggle": toggle
   });
 
-  assert.deepEqual($('.bottom-layer-b').parent('.uls-container').length, 1);
+  assert.deepEqual($('.bottom-layer-b').parent('.slide-under-container').length, 1);
 });
 
-QUnit.test(".uls-container has the correct dimensions.", function(assert) {
+QUnit.test(".slide-under-container has the correct dimensions.", function(assert) {
   var top         = '.top-layer';
   var bottom      = '.bottom-layer';
   var toggle      = '.toggle';
@@ -111,7 +120,7 @@ QUnit.test(".uls-container has the correct dimensions.", function(assert) {
     "toggle": toggle
   });
 
-  var $c  = $('.uls-container');
+  var $c  = $('.slide-under-container');
   assert.deepEqual($c.outerWidth(), dimensions[0]);
   assert.deepEqual($c.outerHeight(), dimensions[1]);
 });
@@ -175,8 +184,8 @@ QUnit.test("A second call using a different under element doesn't double wrap.",
     "toggle": toggle
   });
 
-  assert.deepEqual($('.uls-container').length, 1);
-  assert.deepEqual($('.uls-shim').length, 1);
+  assert.deepEqual($('.slide-under-container').length, 1);
+  assert.deepEqual($('.slide-under-shim').length, 1);
 });
 
 QUnit.test("Destroy removes helper classes.", function(assert) {
@@ -190,17 +199,17 @@ QUnit.test("Destroy removes helper classes.", function(assert) {
   });
   $(bottom).slideUnder('destroy');
 
-  assert.ok(!$(toggle).hasClass('uls-toggle'));
-  assert.ok(!$(toggle).hasClass('uls-active'));
-  assert.ok(!$(top).hasClass('uls-over'));
-  assert.ok(!$(top).hasClass('uls-processed'));
-  assert.ok(!$(bottom).hasClass('uls-under'));
-  assert.ok(!$(bottom).hasClass('uls-visible'));
+  assert.ok(!$(toggle).hasClass('slide-under-toggle'));
+  assert.ok(!$(toggle).hasClass('slide-under-active'));
+  assert.ok(!$(top).hasClass('slide-under-over'));
+  assert.ok(!$(top).hasClass('slide-under-processed'));
+  assert.ok(!$(bottom).hasClass('slide-under-under'));
+  assert.ok(!$(bottom).hasClass('slide-under-visible'));
   
 });
 
 
-QUnit.test("Destroy removes .uls-shim and .uls-container", function(assert) {
+QUnit.test("Destroy removes .slide-under-shim and .slide-under-container", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
   var toggle   = '.toggle';
@@ -211,31 +220,31 @@ QUnit.test("Destroy removes .uls-shim and .uls-container", function(assert) {
   });
   $(bottom).slideUnder('destroy');
 
-  assert.deepEqual($('.uls-shim').length, 0);
-  assert.deepEqual($('.uls-container').length, 0);
+  assert.deepEqual($('.slide-under-shim').length, 0);
+  assert.deepEqual($('.slide-under-container').length, 0);
 });
 
-QUnit.test(".uls-shim is added with correct dimensions.", function(assert) {
+QUnit.test(".slide-under-shim is added with correct dimensions.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
   var toggle   = '.toggle';
 
   var dimensions = [$(top).outerWidth(), $(top).outerHeight()];
 
-  assert.deepEqual($('.uls-shim').length, 0);
+  assert.deepEqual($('.slide-under-shim').length, 0);
 
   $(bottom).slideUnder({
     "over": top,
     "toggle": toggle
   });
 
-  var $shim    = $('.uls-shim');
+  var $shim    = $('.slide-under-shim');
   assert.deepEqual($shim.length, 1);
   assert.deepEqual($shim.width(), dimensions[0]);
   assert.deepEqual($shim.height(), dimensions[1]);
 });
 
-QUnit.test("Top and bottom are wrapped with .uls-container", function(assert) {
+QUnit.test("Top and bottom are wrapped with .slide-under-container", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
   var toggle   = '.toggle';
@@ -245,7 +254,7 @@ QUnit.test("Top and bottom are wrapped with .uls-container", function(assert) {
     "toggle": toggle
   });
 
-  assert.deepEqual($(top).parent('.uls-container').length, 1);
+  assert.deepEqual($(top).parent('.slide-under-container').length, 1);
 });
 
 QUnit.test("Style tags are restored on underlayer on destroy.", function(assert) {
@@ -273,12 +282,12 @@ QUnit.test("Css classes are applied on init.", function(assert) {
     "toggle": toggle
   });
 
-  assert.ok($(top).hasClass('uls-over'));
-  assert.ok($(bottom).hasClass('uls-under'));
-  assert.ok($(bottom).hasClass('uls-processed'));
-  assert.ok($(toggle).hasClass('uls-toggle'));
+  assert.ok($(top).hasClass('slide-under-over'));
+  assert.ok($(bottom).hasClass('slide-under-under'));
+  assert.ok($(bottom).hasClass('slide-under-processed'));
+  assert.ok($(toggle).hasClass('slide-under-toggle'));
 });
 
 QUnit.testDone(function (details) {
-  $('.uls-processed').slideUnder('destroy');
+  $('.slide-under-processed').slideUnder('destroy');
 });
