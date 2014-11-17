@@ -30,6 +30,8 @@
 ;(function($, window, document, undefined) {
 "use strict";
 
+var stackingZ = 1;
+
 // The actual plugin constructor
 function SlideUnder(element, options) {
   this.class      = 'SlideUnder';
@@ -66,8 +68,9 @@ SlideUnder.prototype.init = function () {
   self.$toggle
   .addClass(p + 'toggle')
   .removeClass(p + 'active')
-  .click(function () {
+  .click(function (e) {
     self.toggle();
+    return e.preventDefault();
   });
 
   // 
@@ -112,11 +115,10 @@ SlideUnder.prototype.init = function () {
   .width(self.dimensions[2])
   .css({
     overflow: 'hidden',
-    position: 'absolute',
+    position: 'absolute'
   });
   self.masqueHeight = self.dimensions[1] + self.dimensions[3];
 
-  
   //
   // Container
   self.$container   = self.$over.parent('.' + p + 'container');
@@ -212,7 +214,6 @@ SlideUnder.prototype.speed = function() {
   else if (typeof speeds[this.options.speed] === 'function') {
     speed = speeds[this.options.speed](this);
   }
-  console.log(speed);
 
   return speed;
 };
@@ -237,6 +238,10 @@ SlideUnder.prototype.show = function() {
 
   self.options.beforeShow(self.$under, self);
   self.$toggle.addClass(p + 'active');
+
+  // Bring this container to the top of all others
+  self.$container.css('zIndex', stackingZ++);
+
   self.$under
   .show()
   .add(self.$container)
@@ -274,11 +279,13 @@ SlideUnder.prototype.hide = function() {
   if (typeof self.options.preset.hide === "function") {
     return self.options.preset.hide(self, function () {
       self.$masque.height('100%');
+      
       self.$under
       .removeClass(p + 'visible')
       .hide()
       .add(self.$container)
       .removeClass(p + 'hiding');
+      
       self.options.afterHide(self.$under, self);
     });
   }
@@ -341,7 +348,7 @@ presets.down = {};
  * @var function
  */
 presets.down.afterInit = function (instance) {
-  instance.$under.css('top', instance.travelFrom)
+  instance.$under.css('top', instance.travelFrom);
 };
 
 /**
