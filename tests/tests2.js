@@ -39,25 +39,25 @@ QUnit.test(".slide-under-masque has default id.", function(assert) {
   assert.deepEqual(obj.$masque.attr('id'), 'slide-under-masque-0');
 });
 
-QUnit.test("Preset class 'down' appears in container.", function(assert) {
+QUnit.test("Preset class 'down' appears on underlayer.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
   $(bottom).slideUnder(top);
   var obj = $(bottom).data('slideUnder');
 
-  assert.ok(obj.$container.hasClass('slide-under-preset-down'));
+  assert.ok(obj.$masque.hasClass('slide-under-direction-down'));
 });
 
-QUnit.test("Preset class 'up' appears in container.", function(assert) {
+QUnit.test("Preset class 'up' appears on underlayer.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
   $(bottom).slideUnder({
     over: top,
-    preset: 'up'
+    direction: 'up'
   });
   var obj = $(bottom).data('slideUnder');
 
-  assert.ok(obj.$container.hasClass('slide-under-preset-up'));
+  assert.ok(obj.$masque.hasClass('slide-under-direction-up'));
 });
 
 QUnit.test(".slide-under-masque is wrapped around the underlayer.", function(assert) {
@@ -115,14 +115,14 @@ QUnit.test("Calling with 'hide' or 'show' shows performs the corresponding metho
 
   var obj = $(bottom).data('slideUnder');
   
-  assert.ok(!$(bottom).hasClass('slide-under-visible'));
+  assert.ok(!$(bottom).parent().hasClass('slide-under-visible'));
   assert.ok(!obj.isVisible());
   $(bottom).slideUnder('show');
-  assert.ok($(bottom).hasClass('slide-under-visible'));
+  assert.ok($(bottom).parent().hasClass('slide-under-visible'));
   assert.ok(obj.isVisible());
 
   $(bottom).slideUnder('hide');
-  assert.ok(!$(bottom).hasClass('slide-under-visible'));
+  assert.ok(!$(bottom).parent().hasClass('slide-under-visible'));
   assert.ok(!obj.isVisible());
 });
 
@@ -220,7 +220,7 @@ QUnit.test("Custom preset fires all callbacks", function(assert) {
   $(bottom).slideUnder({
     "over": top,
     "toggle": toggle,
-    "preset": {
+    "direction": {
       "afterInit": function (instance) {
         result.afterInit = instance;
       },
@@ -279,7 +279,7 @@ QUnit.test("Destroy removes helper classes.", function(assert) {
   assert.ok(!$(top).hasClass('slide-under-over'));
   assert.ok(!$(top).hasClass('slide-under-processed'));
   assert.ok(!$(bottom).hasClass('slide-under-under'));
-  assert.ok(!$(bottom).hasClass('slide-under-visible'));
+  assert.ok(!$(bottom).parent().hasClass('slide-under-visible'));
   
 });
 

@@ -12,18 +12,25 @@
  * Helper css classes applied by this plugin (all are prefixed):
  *
  * On the under element:
+ * - processed
  * - under
- * - visible
+ *
+ * On the masque element:
+ * - direction-{preset}, e.g. direction-up
  * - showing
+ * - visible
  * - hiding
  *
  * On the toggle element:
  * - toggle
  * - active
  *
- * On the wrapper element:
- * - wrapper
- * - processed
+ * On the container element:
+ * - container
+ * - showing
+ * - hiding
+ * 
+ * 
  *
  * @license
  */
@@ -51,15 +58,11 @@ SlideUnder.prototype.init = function () {
   var p             = self.options.cssPrefix;
   self.dimensions   = [];
   self.styles       = {};
-  var cssClasses    = [];
 
   //
   // Preset
-  self.presetName = null;
-  if (typeof self.options.preset === 'string' && typeof presets[self.options.preset] === 'object') {
-    self.presetName = self.options.preset;
-    cssClasses.push(p + 'preset-' + self.presetName);
-    self.options.preset = presets[self.presetName];
+  if (typeof self.options.direction === 'string' && typeof directions[self.options.direction] === 'object') {
+    self.options.direction = directions[self.options.direction];
   }
   
   //
@@ -113,6 +116,7 @@ SlideUnder.prototype.init = function () {
   self.$masque
   .height('100%')
   .width(self.dimensions[2])
+  .addClass(p + 'direction-' + self.options.direction.name)
   .css({
     overflow: 'hidden',
     position: 'absolute'
@@ -137,8 +141,7 @@ SlideUnder.prototype.init = function () {
   // Add the correct container dimensions.
   self.$container
   .width(self.dimensions[0])
-  .height(self.dimensions[1])
-  .addClass(cssClasses.join(' '));
+  .height(self.dimensions[1]);
 
   // Apply an id to the masque.
   var id = self.$container.find('.' + p + 'masque').length - 1;
@@ -161,8 +164,8 @@ SlideUnder.prototype.init = function () {
   self.travelTo     = self.dimensions[1];
   
   // Callbacks
-  if (typeof self.options.preset.afterInit === 'function') {
-    self.options.preset.afterInit(self);
+  if (typeof self.options.direction.afterInit === 'function') {
+    self.options.direction.afterInit(self);
   }
   self.options.afterInit(self);
 
@@ -195,7 +198,6 @@ SlideUnder.prototype.destroy = function () {
   self.$under
   .removeData(p + 'style')
   .removeClass(p + 'under')
-  .removeClass(p + 'visible')
   .removeClass(p + 'processed');
   if (self.styles.under) {
     self.$under.attr('style', self.styles.under);
@@ -220,7 +222,7 @@ SlideUnder.prototype.speed = function() {
 
 SlideUnder.prototype.isVisible = function() {
   var p         = this.options.cssPrefix;
-  return this.$under.hasClass(p + 'showing') || this.$under.hasClass(p + 'visible');
+  return this.$masque.hasClass(p + 'showing') || this.$masque.hasClass(p + 'visible');
 };
 
 SlideUnder.prototype.toggle = function() {
@@ -242,18 +244,20 @@ SlideUnder.prototype.show = function() {
   // Bring this container to the top of all others
   self.$container.css('zIndex', stackingZ++);
 
-  self.$under
-  .show()
+  self.$under.show();
+  
+  self.$masque
+  .height(self.masqueHeight)
   .add(self.$container)
   .addClass(p + 'showing');
-  self.$masque.height(self.masqueHeight);
 
-  if (typeof self.options.preset.show === 'function') {
-    self.options.preset.show(self, function () {
-      self.$under
+  if (typeof self.options.direction.show === 'function') {
+    self.options.direction.show(self, function () {
+      self.$masque
       .addClass(p + 'visible')
       .add(self.$container)
       .removeClass(p + 'showing');
+      
       self.options.afterShow(self.$under, self);
     });
   }
@@ -271,18 +275,21 @@ SlideUnder.prototype.hide = function() {
   var p         = self.options.cssPrefix;
 
   self.options.beforeHide(self.$under, self);
+  
   self.$toggle.removeClass(p + 'active');
-  self.$under
+  
+  self.$masque
   .add(self.$container)
   .addClass(p + 'hiding');
 
-  if (typeof self.options.preset.hide === "function") {
-    return self.options.preset.hide(self, function () {
+  if (typeof self.options.direction.hide === "function") {
+    return self.options.direction.hide(self, function () {
       self.$masque.height('100%');
       
-      self.$under
+      self.$under.hide();
+
+      self.$masque
       .removeClass(p + 'visible')
-      .hide()
       .add(self.$container)
       .removeClass(p + 'hiding');
       
@@ -331,14 +338,21 @@ speeds.constant = function (instance) {
  *
  * @var object
  */
-var presets = {};
+var directions = {};
 
 /**
  * This preset is used for revealing as if sliding downward.
  *
  * @type {Object}
  */
-presets.down = {};
+directions.down = {};
+
+/**
+ * This name is used to identify this preset and to generate css classes, etc.
+ *
+ * @var string
+ */
+directions.down.name = 'down';
 
 /**
  * Defines the preset callback post initialization.
@@ -347,7 +361,7 @@ presets.down = {};
  *
  * @var function
  */
-presets.down.afterInit = function (instance) {
+directions.down.afterInit = function (instance) {
   instance.$under.css('top', instance.travelFrom);
 };
 
@@ -359,7 +373,7 @@ presets.down.afterInit = function (instance) {
  *
  * @var function
  */
-presets.down.show = function (instance, callback) {
+directions.down.show = function (instance, callback) {
   instance.$under.animate({
     "top": instance.travelTo,
   }, instance.speed(), callback);
@@ -373,7 +387,7 @@ presets.down.show = function (instance, callback) {
  * 
  * @var function
  */
- presets.down.hide = function (instance, callback) {
+ directions.down.hide = function (instance, callback) {
   instance.$under.animate({
     "top": instance.travelFrom,
   }, instance.speed(), function () {
@@ -382,12 +396,13 @@ presets.down.show = function (instance, callback) {
 };
 
 /**
- * This preset is used for revealing as if sliding downward.
+ * This direction preset is used for revealing as if sliding upward.
  *
  * @type {Object}
  */
-presets.up = {};
-presets.up.afterInit = function (instance) {
+directions.up = {};
+directions.up.name = 'up';
+directions.up.afterInit = function (instance) {
   instance.$masque.css('marginTop', -1 * (instance.dimensions[3]));
   // instance.$container.css('marginTop', -1 * (instance.dimensions[3]));
   instance.$over.css('bottom', 0);
@@ -395,14 +410,14 @@ presets.up.afterInit = function (instance) {
   .css('top', instance.dimensions[3])
   .hide();
 };
-presets.up.show = function (instance, callback) {
+directions.up.show = function (instance, callback) {
   instance.$under
   .show()
   .animate({
     "top": 0,
   }, instance.speed(), callback);
 };
-presets.up.hide = function (instance, callback) {
+directions.up.hide = function (instance, callback) {
   instance.$under.animate({
     'top': instance.dimensions[3]
   }, instance.speed(), function () {
@@ -445,17 +460,17 @@ $.fn.slideUnder.defaults = {
    *
    * @var string
    */
-  "over"             : null,
+  "over"              : null,
   
   /**
-   * Defines the preset to use for animation.
+   * Defines the direction present or custom object.
    *
    * You can define your own preset as an object or use on from the presets
    * objects, e.g. 'down'
    *
    * @var string||object
    */
-  "preset"           : 'down',
+  "direction"         : 'down',
 
   /**
    * Defines a speed preset or custom function.

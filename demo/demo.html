@@ -23,7 +23,14 @@
         return false;
       });
 
-      // Example 2
+      // Example up
+      $('#bottom-up').slideUnder({
+        over: $('#top-up'),
+        toggle: $('#toggle-up'),
+        direction: 'up'
+      });
+
+      // Example 3
       $('#bottom-2').slideUnder({
         "toggle": '#toggle-2',
         "over": '#top-2',
@@ -53,23 +60,9 @@
 
     <p><div class="fb-like" data-web-package="homepage" data-href="" data-layout="standard" data-action="like" datshow-1a-faces="true" data-share="true"></div></p>
 
-    <!-- Key features of jquery.slide_under.js -->
-    <div class="well">
-      <ul>
-        <li>Achieve the affect of one element sliding under another and disappearing.</li>
-        <li>Does not tweak the dimensions of the underlayer like slideUp() and slideDown().</li>
-      </ul>
-    </div>
-
     <p>
-      <a href="" type="button" class="btn btn-primary" data-web-package="homepage">Homepage</a>
-      <a href="https://github.com/aklump/jquery.slide_under" type="button" class="btn btn-primary btn-success">Download</a>
+      <a href="index.html" type="button" class="btn btn-primary" data-web-package="homepage">Back</a>
     </p> 
-    
-    <h2>Demo Instructions</h2>
-    <ol>
-      <li>Click the <em>show</em> link under Example 1a; then click <em>hide</em>.</li>
-    </ol>
     <hr />
 
     <h2>Example 1b</h2>
@@ -91,10 +84,7 @@ $('#toggle-1a').click(function () {
   return false;
 });</pre>
 
-
-
-
-    <h2>Example Two</h2>
+    <h2>Example 2</h2>
     <p class="lead">Use the toggle option and allow plugin to handle hide/show methods automatically.</p>
         
     <button id="toggle-2" class="btn btn-info">Simple toggle</button>
@@ -137,6 +127,20 @@ $(".bottom-layer").slideUnder({
   left: 300px;
 }    
     </pre>
+
+    <h2>Example 3</h2>
+    <p class="lead">In this example the up direction preset 'up' is used for upward travel.</p>
+    <img src="images/eiffel-tower.jpg" id="bottom-up"/>
+    <div class="over" id="top-up"></div>
+    <a href="#" id="toggle-up">Toggle</a>
+
+    <h3>Javascript</h3>
+      <pre>$('#bottom-up').slideUnder({
+  over: $('#top-up'),
+  toggle: $('#toggle-up'),
+  direction: 'up'
+});</pre>
+    
 
 
 
