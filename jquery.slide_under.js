@@ -7,7 +7,7 @@
  * Copyright 2013, Aaron Klump
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Mon Nov 17 11:46:18 PST 2014
+ * Date: Mon Nov 17 13:19:48 PST 2014
  *
  * Helper css classes applied by this plugin (all are prefixed):
  *
@@ -29,8 +29,6 @@
  * - container
  * - showing
  * - hiding
- * 
- * 
  *
  * @license
  */
@@ -105,10 +103,7 @@ SlideUnder.prototype.init = function () {
   self.$under
   .wrap('<div class="' + p + 'masque"></div>')
   .addClass(p + 'under ' + p + 'processed')
-  .css('position', 'absolute')
-  // It may seem superfluous to hide this, but we do it so that a call to
-  // $().is(':visible') is more intuitive.
-  .hide();
+  .css('position', 'absolute');
 
   //
   // Masque
@@ -120,7 +115,10 @@ SlideUnder.prototype.init = function () {
   .css({
     overflow: 'hidden',
     position: 'absolute'
-  });
+  })
+  // It may seem superfluous to hide this, but we do it so that a call to
+  // $().is(':visible') is more intuitive.
+  .hide();  
   self.masqueHeight = self.dimensions[1] + self.dimensions[3];
 
   //
@@ -244,10 +242,9 @@ SlideUnder.prototype.show = function() {
   // Bring this container to the top of all others
   self.$container.css('zIndex', stackingZ++);
 
-  self.$under.show();
-  
   self.$masque
   .height(self.masqueHeight)
+  .show()
   .add(self.$container)
   .addClass(p + 'showing');
 
@@ -284,11 +281,9 @@ SlideUnder.prototype.hide = function() {
 
   if (typeof self.options.direction.hide === "function") {
     return self.options.direction.hide(self, function () {
-      self.$masque.height('100%');
-      
-      self.$under.hide();
-
       self.$masque
+      .height('100%')
+      .hide()
       .removeClass(p + 'visible')
       .add(self.$container)
       .removeClass(p + 'hiding');
@@ -441,26 +436,29 @@ $.fn.slideUnder = function(options) {
         options = {"over": options};
       }
 
+      if ($(options.over).length === 0) {
+        throw 'The "over" option must reference an existing DOM element.';
+      };
+
       $.data(this, 'slideUnder', new SlideUnder(this, options));    
     }
   });
 };
 
 $.fn.slideUnder.defaults = {
-  
-  /**
-   * Defines the selector for the toggle element.
-   *
-   * @var string
-   */
-  "toggle"            : null,
-
   /**
    * Defines the selector for the element under which we'll slide.
    *
    * @var string
    */
   "over"              : null,
+
+  /**
+   * Defines the selector for the toggle element.
+   *
+   * @var string
+   */
+  "toggle"            : null,
   
   /**
    * Defines the direction present or custom object.

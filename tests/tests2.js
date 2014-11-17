@@ -1,3 +1,44 @@
+QUnit.test("Classes hiding are applied during transitions.", function(assert) {
+  var top      = '#top-animation';
+  var bottom   = '#bottom-animation';
+  $(bottom).slideUnder({
+    over: top,
+    speed: 'absolute',
+    rate: 0
+  });
+  var obj = $(bottom).data('slideUnder');
+
+  obj.show();
+  obj.options.rate = 6;
+
+  $(bottom).slideUnder('hide');
+  stop();
+  setTimeout(function() {
+    assert.ok(obj.$container.hasClass('slide-under-hiding'));
+    assert.ok(obj.$masque.hasClass('slide-under-hiding'));
+    start();
+  }, 3);
+});
+
+QUnit.test("Classes showing are applied during transitions.", function(assert) {
+  var top      = '#top-animation';
+  var bottom   = '#bottom-animation';
+  $(bottom).slideUnder({
+    over: top,
+    speed: 'absolute',
+    rate: 6
+  });
+  var obj = $(bottom).data('slideUnder');
+
+  $(bottom).slideUnder('show');
+  stop();
+  setTimeout(function() {
+    assert.ok(obj.$container.hasClass('slide-under-showing'));
+    assert.ok(obj.$masque.hasClass('slide-under-showing'));
+    start();
+  }, 3);
+});
+
 QUnit.test("Before hide under is visible, after hide under is hidden.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
