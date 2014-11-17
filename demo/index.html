@@ -6,39 +6,39 @@
   <script src="jquery.slide_under.js"></script>
   <style type="text/css" media="all">
     @import url("css/bootstrap.min.css");
-    @import url("css/slide_under.css");
     @import url("css/example.css");
   </style>  
   <script>
   (function($) {
     $('document').ready(function(){
-
-      var speed = 300;
-
-      $('.slide-down-toggle').click(function () {
-        $('.slide-down-underlayer').slideToggle(speed);
-      })
-
-      $("#a-bottom-layer").slideUnder("#a-top-layer");
-      $('#a-show').click(function () {
-        $("#a-bottom-layer").slideUnder('show');
+      $("#bottom-1a").slideUnder("#top-1a");
+      $("#space-needle").slideUnder('#top-1a');
+      var spaceNeedle = $("#space-needle").data('slideUnder');
+      var bottom1a = $("#bottom-1a").data('slideUnder');
+      $('#show-1a').click(function () {
+        $("#bottom-1a").slideUnder('show');
         return false;
-      })
-      $('#a-hide').click(function () {
-        $("#a-bottom-layer").slideUnder('hide');
+      });
+      $('#hide-1a').click(function () {
+        $("#bottom-1a").slideUnder('hide');
         return false;
-      })
-
-      
-      $('.under').slideUnder({
-        "toggle": '.toggle',
-        "over": '.over',
       });
-      $('.under2').slideUnder({
-        "toggle": '.toggle2',
-        "over": '.over',
+      $('#toggle-1a').click(function () {
+        $("#bottom-1a").slideUnder('toggle');
+        return false;
       });
-
+      $('#constant').click(function () {
+        spaceNeedle.options.speed = 'constant';
+        bottom1a.options.speed    = 'constant';
+        $("#space-needle").slideUnder('toggle');
+        $("#bottom-1a").slideUnder("toggle");
+      });
+      $('#absolute').click(function () {
+        spaceNeedle.options.speed = 'absolute';
+        bottom1a.options.speed    = 'absolute';
+        $("#space-needle").slideUnder('toggle');
+        $("#bottom-1a").slideUnder("toggle");
+      });
     });
   })(jQuery);
   </script>
@@ -57,13 +57,14 @@
     <h1><!--$web_package_name--><!--/$web_package_name--> Demo <small>jquery.slide_under.js</small></h1>
     <p class="lead"><!--$web_package_description--><!--/$web_package_description--></p>
 
-    <p><div class="fb-like" data-web-package="homepage" data-href="" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div></p>
+    <p><div class="fb-like" data-web-package="homepage" data-href="" data-layout="standard" data-action="like" datshow-1a-faces="true" data-share="true"></div></p>
 
     <!-- Key features of jquery.slide_under.js -->
     <div class="well">
       <ul>
-        <li>Three components: wrapper, underlayer, toggle</li>
-        <li>When tapped, the toggle will cause the underlayer to slide out from under the wrapper in a direction.</li>
+        <li>Produces the affect of one element sliding under another element and disappearing.</li>
+        <li>Does not tweak the dimensions of the underlayer like slideUp() and slideDown().</li>
+        <li>Multiple speed algorithms for different effects with adjustable rates.</li>
       </ul>
     </div>
 
@@ -74,82 +75,45 @@
     
     <h2>Demo Instructions</h2>
     <ol>
-      <li>Do this</li>
-      <li>Do that</li>
-      <li>See also <a href="demo.html">Demo</a></li>
+      <li>Click the <em>toggle</em> link; click it again.  The image is not destorted during the transition.</li>
+      <li>Click the <em>show</em> link; then click <em>hide</em>. Notice the overlayer color change; this is due to helper classes <code>slide-under-showing</code> and <code>slide-under-hiding</code>.</li>
+      <li>Compare speed algorithms <a href="#" id="constant">constant</a> with <a href="#" id="absolute">absolute</a>.</li>
+      <li>View <a href="demo.html">more demos</a>.</li>
     </ol>
     <hr />
 
-<!--     <h2>Example $.slideDown()</h2>
-    
-    <div class="slide-down">
-      <div class="slide-down-toggle">Wrapper>Trigger</div>
-      
-      <div class="slide-down-wrapper">Wrapper
-        <img src="images/eiffel-tower.jpg" alt="Eiffel Tower" class="slide-down-underlayer"/>
-      </div>      
-    </div> -->
+    <a href="#" id="toggle-1a">Toggle</a>
+    <a href="#" id="show-1a">Show</a>
+    <a href="#" id="hide-1a">Hide</a>
 
-    <h2>Example One</h2>
-    
-    <p class="lead">Instantiate with selector as argument and use explicit form of the hide/show to trigger the slide.</p>
-
-    <a href="#" id="a-show">Show</a>
-    <a href="#" id="a-hide">Hide</a>
-    <img src="images/eiffel-tower.jpg" id="a-bottom-layer"/>
-    <div class="over" id="a-top-layer">Overlayer</div>
+    <img src="images/eiffel-tower.jpg" id="bottom-1a"/>
+    <img src="images/space-needle.jpg" alt="Space Needle" id="space-needle"/>
+    <div class="over" id="top-1a"></div>
 
     <h3>Html</h3>
-    <pre>&lt;a href="#" id="a-show">Show&lt;/a>
-&lt;a href="#" id="a-hide">Hide&lt;/a>
-&ltimg src="images/eiffel-tower.jpg" id="a-bottom-layer"/>
-&lt;div id="a-top-layer">Overlayer&lt;/div></pre>
+    <pre>&lt;a href="#" id="toggle-1a">Toggle</a>
+&lt;a href="#" id="show-1a">Show&lt;/a>
+&lt;a href="#" id="hide-1a">Hide&lt;/a>
+&ltimg src="images/eiffel-tower.jpg" id="bottom-1a"/>
+&lt;div id="top-1a">Overlayer&lt;/div></pre>
 
+    <ul>
+      <li>Notice the underlayer comes <strong>before</strong> the overlayer in the DOM.  Do this and you won't have to tweak with z-index.</li>
+    </ul>
     <h3>Javascript</h3>
-    <pre>$("#a-bottom-layer").slideUnder("#a-top-layer");
-$('#a-show').click(function () {
-  $("#a-bottom-layer").slideUnder('show');
+    <pre>$("#bottom-1a").slideUnder("#top-1a");
+$('#show-1a').click(function () {
+  $("#bottom-1a").slideUnder('show');
   return false;
-})
-$('#a-hide').click(function () {
-  $("#a-bottom-layer").slideUnder('hide');
-  return false;
-})</pre>
-
-    <h2>Example Two</h2>
-    <p class="lead">Use the toggle option and allow plugin to handle hide/show methods automatically.</p>
-
-    <h3>Markup</h3>
-
-    <pre>&lt;!-- This element is used to toggle display-->
-&lt;div class="toggle">Show/Hide&lt;/div> 
-
-&lt;!-- The underlayer element should come first and will appear to slide out from
-under the element that comes second. -->
-&lt;img src="images/eiffel-tower.jpg" class="bottom-layer"/>
-&lt;div class="top-layer">Overlayer&lt;/div></pre>
-    
-    <h3>Javascript</h3>
-    <pre>
-$(".bottom-layer").slideUnder({
-  "over": ".over-layer",
-  "toggle": ".toggle"
 });
-    </pre>
+$('#hide-1a').click(function () {
+  $("#bottom-1a").slideUnder('hide');
+  return false;
+});
+$('#toggle-1a').click(function () {
+  $("#bottom-1a").slideUnder("toggle");
+});</pre>
 
-        
-        <button class="btn btn-info toggle2">Simple toggle</button>
-        <div class="toggle">
-          <button class="btn btn-success toggle-show">Click to reveal the hidden layer</button>
-          <button class="btn btn-danger toggle-hide">Click to retract the layer</button>
-        </div>
-
-        <img src="images/space-needle.jpg" alt="Space Needle" class="under2"/>
-        <img src="images/eiffel-tower.jpg" alt="Eiffel Tower" class="under"/>
-        <div class="over">Top Layer</div>
-        <!-- <div class="example-overlayer uls-overlayer">Overlayer</div> -->
-
-    <!-- Add your markup for the example here -->
     <hr />
     <p class="text-muted"><strong>jquery.slide_under</strong> is brought to you by <a href="http://www.intheloftstudios.com">In the Loft Studios</a></p>
   </div>

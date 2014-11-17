@@ -5,12 +5,24 @@
     display: inline; }
   .toggle .toggle-hide {
     display: none; }
-  .toggle.uls-active .toggle-show {
+  .toggle.slide-under-active .toggle-show {
     display: none; }
-  .toggle.uls-active .toggle-hide {
+  .toggle.slide-under-active .toggle-hide {
     display: inline; }
 
 .over {
   width: 100%;
   height: 100px;
-  background-color: #79d26e; }
+  background-color: #000; }
+
+.slide-under-showing > .over {
+  background-color: #C6364D; }
+
+.slide-under-hiding > .over {
+  background-color: #BDCD38; }
+
+#slide-under-masque-space-needle {
+  left: 300px; }
+
+.slide-under-toggle {
+  cursor: pointer; }
