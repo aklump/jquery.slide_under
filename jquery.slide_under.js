@@ -7,7 +7,7 @@
  * Copyright 2013, Aaron Klump
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Sun Nov 16 09:30:44 PST 2014
+ * Date: Mon Nov 17 11:46:18 PST 2014
  *
  * Helper css classes applied by this plugin (all are prefixed):
  *
@@ -76,7 +76,9 @@ SlideUnder.prototype.init = function () {
   self.styles.over  = self.$over.attr('style');
   self.dimensions[0]     = self.$over.outerWidth();
   self.dimensions[1]     = self.$over.outerHeight();
-  self.$over.addClass(p + 'over');
+  self.$over
+  .addClass(p + 'over')
+  .css('position', 'absolute');
 
   //
   // Shim element
@@ -96,13 +98,22 @@ SlideUnder.prototype.init = function () {
   self.dimensions[3]     = self.$under.outerHeight();
   self.$under
   .wrap('<div class="' + p + 'masque"></div>')
-  .addClass(p + 'under ' + p + 'processed');
+  .addClass(p + 'under ' + p + 'processed')
+  .css('position', 'absolute')
+  // It may seem superfluous to hide this, but we do it so that a call to
+  // $().is(':visible') is more intuitive.
+  .hide();
 
   //
   // Masque
   self.$masque = self.$under.parent('.' + p + 'masque');
   self.$masque
-  .width(self.dimensions[2]);
+  .height('100%')
+  .width(self.dimensions[2])
+  .css({
+    overflow: 'hidden',
+    position: 'absolute',
+  });
   self.masqueHeight = self.dimensions[1] + self.dimensions[3];
 
   
@@ -138,6 +149,7 @@ SlideUnder.prototype.init = function () {
   // positioning.
   self.$shim        = $();
   if (self.options.shim && self.$container.next('.' + p + 'shim').length === 0) {
+    self.$container.css('position', 'absolute');
     self.$over.parent().after($shim);
     self.$shim = $shim;
   }
@@ -225,13 +237,17 @@ SlideUnder.prototype.show = function() {
 
   self.options.beforeShow(self.$under, self);
   self.$toggle.addClass(p + 'active');
-  self.$under.addClass(p + 'showing');
+  self.$under
+  .show()
+  .add(self.$container)
+  .addClass(p + 'showing');
   self.$masque.height(self.masqueHeight);
 
   if (typeof self.options.preset.show === 'function') {
     self.options.preset.show(self, function () {
       self.$under
       .addClass(p + 'visible')
+      .add(self.$container)
       .removeClass(p + 'showing');
       self.options.afterShow(self.$under, self);
     });
@@ -251,13 +267,17 @@ SlideUnder.prototype.hide = function() {
 
   self.options.beforeHide(self.$under, self);
   self.$toggle.removeClass(p + 'active');
-  self.$under.addClass(p + 'hiding');
+  self.$under
+  .add(self.$container)
+  .addClass(p + 'hiding');
 
   if (typeof self.options.preset.hide === "function") {
     return self.options.preset.hide(self, function () {
-      self.$masque.height('');
+      self.$masque.height('100%');
       self.$under
       .removeClass(p + 'visible')
+      .hide()
+      .add(self.$container)
       .removeClass(p + 'hiding');
       self.options.afterHide(self.$under, self);
     });
@@ -321,12 +341,7 @@ presets.down = {};
  * @var function
  */
 presets.down.afterInit = function (instance) {
-  instance.$under
-  .css('top', instance.travelFrom)
-
-  // It may seem superfluous to hide this, but we do it so that a call to
-  // $().is(':visible') is more intuitive.
-  .hide();
+  instance.$under.css('top', instance.travelFrom)
 };
 
 /**
@@ -338,9 +353,7 @@ presets.down.afterInit = function (instance) {
  * @var function
  */
 presets.down.show = function (instance, callback) {
-  instance.$under
-  .show()
-  .animate({
+  instance.$under.animate({
     "top": instance.travelTo,
   }, instance.speed(), callback);
 };

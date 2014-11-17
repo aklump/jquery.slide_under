@@ -1,3 +1,24 @@
+QUnit.test("Before hide under is visible, after hide under is hidden.", function(assert) {
+  var top      = '.top-layer';
+  var bottom   = '.bottom-layer';
+  $(bottom).slideUnder(top);
+
+  $(bottom).slideUnder('show');
+  assert.ok($(bottom).is(':visible'));
+  $(bottom).slideUnder('hide');
+  assert.ok($(bottom).is(':hidden'));
+});
+
+QUnit.test("Before show under is hidden, afterShow under is visible.", function(assert) {
+  var top      = '.top-layer';
+  var bottom   = '.bottom-layer';
+  $(bottom).slideUnder(top);
+
+  assert.ok($(bottom).is(':hidden'));
+  $(bottom).slideUnder('show');
+  assert.ok($(bottom).is(':visible'));
+});
+
 QUnit.test(".slide-under-masque has derivitive id of under when under has id.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';

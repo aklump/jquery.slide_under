@@ -23,8 +23,18 @@
   background-color: #000;
 }
 
+.slide-under-showing>.over{
+  background-color: #C6364D;
+}
+
+.slide-under-hiding>.over{
+  background-color: #BDCD38;
+}
+
 #slide-under-masque-space-needle {
   left: 300px;
 }
 
-
+.slide-under-toggle {
+  cursor: pointer;
+}
