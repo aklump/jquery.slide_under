@@ -1,3 +1,31 @@
+QUnit.test("Preset class 'down' appears in container.", function(assert) {
+  var top      = '.top-layer';
+  var bottom   = '.bottom-layer';
+  $(bottom).slideUnder(top);
+  var obj = $(bottom).data('slideUnder');
+
+  assert.ok(obj.$container.hasClass('slide-under-preset-down'));
+});
+
+QUnit.test("Preset class 'up' appears in container.", function(assert) {
+  var top      = '.top-layer';
+  var bottom   = '.bottom-layer';
+  $(bottom).slideUnder({
+    over: top,
+    preset: 'up'
+  });
+  var obj = $(bottom).data('slideUnder');
+
+  assert.ok(obj.$container.hasClass('slide-under-preset-up'));
+});
+
+QUnit.test(".slide-under-masque is wrapped around the underlayer.", function(assert) {
+  var top      = '.top-layer';
+  var bottom   = '.bottom-layer';
+  $(bottom).slideUnder(top);
+  assert.deepEqual($(bottom).parent('.slide-under-masque').length, 1);
+});
+
 QUnit.test("With two instances, two shims are created.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
@@ -27,19 +55,23 @@ QUnit.test("Passing a jQuery selector as options converts it to the over option.
 
 });
 
-QUnit.test("Underlayer is position correctly on init.", function(assert) {
+QUnit.test("Layers and masque are position correctly on init.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
   $(top).height(100);
   $(bottom).height(300);
   $(bottom).slideUnder({
     "over": top,
+    "preset": 'down'
   });
+  var obj = $(bottom).data('slideUnder');
 
   assert.deepEqual($(bottom).css('top'), '-200px');
+  assert.deepEqual($(top).css('top'), '0px');
+  assert.deepEqual(obj.$masque.css('top'), '0px');
 
-  $(top).height(100);
-  $(bottom).height(200);
+  $(top).height('');
+  $(bottom).height('');
   $(bottom).slideUnder('destroy');  
 });
 
@@ -92,7 +124,7 @@ QUnit.test("Speed calculates correctly", function(assert) {
   $(top).add($(bottom)).removeAttr('style');
 });
 
-QUnit.test("A second call using a different under element places second under inside .slide-under-container.", function(assert) {
+QUnit.test("A second call using a different under element places second .masque inside .slide-under-container.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
   var toggle   = '.toggle';
@@ -106,14 +138,15 @@ QUnit.test("A second call using a different under element places second under in
     "toggle": toggle
   });
 
-  assert.deepEqual($('.bottom-layer-b').parent('.slide-under-container').length, 1);
+  assert.deepEqual($('.bottom-layer-b').parent('.slide-under-masque').parent('.slide-under-container').length, 1);
 });
 
-QUnit.test(".slide-under-container has the correct dimensions.", function(assert) {
+QUnit.test("container and masque have the correct dimensions.", function(assert) {
   var top         = '.top-layer';
   var bottom      = '.bottom-layer';
   var toggle      = '.toggle';
-  var dimensions  = [$(top).outerWidth(), $(top).outerHeight() + $(bottom).outerHeight()];
+  // var dimensions  = [$(top).outerWidth(), $(top).outerHeight() + $(bottom).outerHeight()];
+  var dimensions  = [$(top).outerWidth(), $(top).outerHeight(), $(bottom).outerWidth(), $(bottom).outerHeight()];
 
   $(bottom).slideUnder({
     "over": top,
@@ -123,6 +156,13 @@ QUnit.test(".slide-under-container has the correct dimensions.", function(assert
   var $c  = $('.slide-under-container');
   assert.deepEqual($c.outerWidth(), dimensions[0]);
   assert.deepEqual($c.outerHeight(), dimensions[1]);
+
+  var $m  = $('.slide-under-masque');
+  assert.deepEqual($m.outerWidth(), dimensions[0]);
+  assert.deepEqual($m.outerHeight(), dimensions[1]);
+
+  $(toggle).click();
+  assert.deepEqual($m.outerHeight(), dimensions[1] + dimensions[3]);
 });
 
 QUnit.test("Defaults hide underlayer on init.", function(assert) {
@@ -209,7 +249,7 @@ QUnit.test("Destroy removes helper classes.", function(assert) {
 });
 
 
-QUnit.test("Destroy removes .slide-under-shim and .slide-under-container", function(assert) {
+QUnit.test("Destroy removes shim, container, masque", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
   var toggle   = '.toggle';
@@ -222,6 +262,7 @@ QUnit.test("Destroy removes .slide-under-shim and .slide-under-container", funct
 
   assert.deepEqual($('.slide-under-shim').length, 0);
   assert.deepEqual($('.slide-under-container').length, 0);
+  assert.deepEqual($('.slide-under-masque').length, 0);
 });
 
 QUnit.test(".slide-under-shim is added with correct dimensions.", function(assert) {

@@ -2,11 +2,20 @@
   cursor: pointer;
 }
 .slide-under-container {
-  position: absolute;
   z-index: 1;
-  overflow: hidden;
 }
+.slide-under-container,
+.slide-under-masque,
 .slide-under-over,
 .slide-under-under {
   position: absolute;
+}
+.slide-under-masque,
+.slide-under-over {
+  top: 0;
+  left: 0;
+}
+.slide-under-masque {
+  overflow: hidden;
+  height: 100%;
 }

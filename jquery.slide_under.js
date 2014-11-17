@@ -7,7 +7,7 @@
  * Copyright 2013, Aaron Klump
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Sun Nov 16 09:26:18 PST 2014
+ * Date: Sun Nov 16 09:30:44 PST 2014
  *
  * Helper css classes applied by this plugin (all are prefixed):
  *
@@ -49,6 +49,16 @@ SlideUnder.prototype.init = function () {
   var p             = self.options.cssPrefix;
   self.dimensions   = [];
   self.styles       = {};
+  var cssClasses    = [];
+
+  //
+  // Preset
+  self.presetName = null;
+  if (typeof self.options.preset === 'string' && typeof presets[self.options.preset] === 'object') {
+    self.presetName = self.options.preset;
+    cssClasses.push(p + 'preset-' + self.presetName);
+    self.options.preset = presets[self.presetName];
+  }
   
   //
   // Toggle
@@ -82,25 +92,39 @@ SlideUnder.prototype.init = function () {
   // Underlayer
   self.$under       = $(self.element);
   self.styles.under = self.$under.attr('style');
-  self.dimensions[2]     = self.$under.outerHeight();
+  self.dimensions[2]     = self.$under.outerWidth();
+  self.dimensions[3]     = self.$under.outerHeight();
   self.$under
+  .wrap('<div class="' + p + 'masque"></div>')
   .addClass(p + 'under ' + p + 'processed');
 
+  //
+  // Masque
+  self.$masque = self.$under.parent('.' + p + 'masque');
+  self.$masque
+  .width(self.dimensions[2]);
+  self.masqueHeight = self.dimensions[1] + self.dimensions[3];
+  
   //
   // Container
   self.$container   = self.$over.parent('.' + p + 'container');
   if (self.$container.length === 0) {
-    self.$over.add(self.$under).wrapAll($('<div>').addClass(p + 'container'));  
+    var $wrap = $('<div>').addClass(p + 'container');
+    // self.$masque.wrapAll($wrap);
+    self.$over
+    .add(self.$masque)
+    .wrapAll($wrap);  
     self.$container = self.$over.parent('.' + p + 'container');
   }
   else {
-    self.$container.prepend(self.$under);
+    self.$container.prepend(self.$masque);
   }
 
   // Add the correct container dimensions.
   self.$container
   .width(self.dimensions[0])
-  .height(self.dimensions[1] + self.dimensions[2]);
+  .height(self.dimensions[1])
+  .addClass(cssClasses.join(' '));
 
   // This shim will hold the place of options.under when it goes to absolute
   // positioning.
@@ -111,7 +135,7 @@ SlideUnder.prototype.init = function () {
   }
 
   // The distance needed to travel during expose/hide op.
-  self.travelFrom   = self.dimensions[2] * -1 + self.dimensions[1];
+  self.travelFrom   = self.dimensions[3] * -1 + self.dimensions[1];
   self.travelTo     = self.dimensions[1];
   self.speed        = self.options.speed * Math.abs(self.travelFrom) / 100;
   
@@ -133,6 +157,7 @@ SlideUnder.prototype.destroy = function () {
 
   // Remove the container and shim elements.
   self.$shim.remove();
+  self.$under.unwrap();
   self.$over.unwrap();
 
   self.$over
@@ -181,6 +206,7 @@ SlideUnder.prototype.show = function() {
   self.options.beforeShow(self.$under, self);
   self.$toggle.addClass(p + 'active');
   self.$under.addClass(p + 'showing');
+  self.$masque.height(self.masqueHeight);
 
   if (typeof self.options.preset.show === 'function') {
     self.options.preset.show(self, function () {
@@ -209,6 +235,7 @@ SlideUnder.prototype.hide = function() {
 
   if (typeof self.options.preset.hide === "function") {
     return self.options.preset.hide(self, function () {
+      self.$masque.height('');
       self.$under
       .removeClass(p + 'visible')
       .removeClass(p + 'hiding');
@@ -289,20 +316,23 @@ presets.down.show = function (instance, callback) {
  */
 presets.up = {};
 presets.up.afterInit = function (instance) {
+  instance.$masque.css('marginTop', -1 * (instance.dimensions[3]));
+  // instance.$container.css('marginTop', -1 * (instance.dimensions[3]));
+  instance.$over.css('bottom', 0);
   instance.$under
-  .css('bottom', instance.travelFrom)
+  .css('top', instance.dimensions[3])
   .hide();
 };
 presets.up.show = function (instance, callback) {
   instance.$under
   .show()
   .animate({
-    "bottom": instance.travelTo,
+    "top": 0,
   }, instance.speed, callback);
 };
 presets.up.hide = function (instance, callback) {
   instance.$under.animate({
-    "bottom": instance.travelFrom,
+    'top': instance.dimensions[3]
   }, instance.speed, function () {
     instance.$under.hide();
     callback();
@@ -348,11 +378,12 @@ $.fn.slideUnder.defaults = {
   /**
    * Defines the preset to use for animation.
    *
-   * Valid options are: down. 
+   * You can define your own preset as an object or use on from the presets
+   * objects, e.g. 'down'
    *
-   * @var type
+   * @var string||object
    */
-  "preset"         : presets.down,
+  "preset"         : 'down',
 
   /**
    * Define how many milliseconds to travel 100px.
