@@ -104,6 +104,7 @@ SlideUnder.prototype.init = function () {
   self.$masque
   .width(self.dimensions[2]);
   self.masqueHeight = self.dimensions[1] + self.dimensions[3];
+
   
   //
   // Container
@@ -126,6 +127,13 @@ SlideUnder.prototype.init = function () {
   .height(self.dimensions[1])
   .addClass(cssClasses.join(' '));
 
+  // Apply an id to the masque.
+  var id = self.$container.find('.' + p + 'masque').length - 1;
+  if (self.$under.attr('id')) {
+    id = self.$under.attr('id');
+  }
+  self.$masque.attr('id', p + 'masque-' + id);
+
   // This shim will hold the place of options.under when it goes to absolute
   // positioning.
   self.$shim        = $();
@@ -137,7 +145,6 @@ SlideUnder.prototype.init = function () {
   // The distance needed to travel during expose/hide op.
   self.travelFrom   = self.dimensions[3] * -1 + self.dimensions[1];
   self.travelTo     = self.dimensions[1];
-  self.speed        = self.options.speed * Math.abs(self.travelFrom) / 100;
   
   // Callbacks
   if (typeof self.options.preset.afterInit === 'function') {
@@ -183,6 +190,19 @@ SlideUnder.prototype.destroy = function () {
     self.$under.removeAttr('style');
   }
   
+};
+
+SlideUnder.prototype.speed = function() {
+  var speed = this.options.rate;
+  if (typeof this.options.speed === 'function') {
+    speed = this.options.speed(this);
+  }
+  else if (typeof speeds[this.options.speed] === 'function') {
+    speed = speeds[this.options.speed](this);
+  }
+  console.log(speed);
+
+  return speed;
 };
 
 SlideUnder.prototype.isVisible = function() {
@@ -247,6 +267,36 @@ SlideUnder.prototype.hide = function() {
 };
 
 
+/**
+ * Defines one or more speed calculation functions.
+ *
+ * @var object
+ */
+var speeds = {};
+
+/**
+ * This preset will insure that no matter the size of underlayer, it will
+ * always take options.rate milliseconds to be exposed.
+ *
+ * @param  {SlideUnder} instance
+ *
+ * @return {int}
+ */
+speeds.absolute = function (instance) {
+  return instance.options.rate;
+};
+
+/**
+ * This preset will insure that the underlayer moves at a constant speed, the
+ * time it takes to expose will depend on the size of the underlayer.
+ *
+ * @param  {SlideUnder} instance
+ *
+ * @return {int}
+ */
+speeds.constant = function (instance) {
+  return instance.options.rate * Math.abs(instance.travelFrom) / 200;
+};
 
 
 /**
@@ -273,6 +323,9 @@ presets.down = {};
 presets.down.afterInit = function (instance) {
   instance.$under
   .css('top', instance.travelFrom)
+
+  // It may seem superfluous to hide this, but we do it so that a call to
+  // $().is(':visible') is more intuitive.
   .hide();
 };
 
@@ -289,7 +342,7 @@ presets.down.show = function (instance, callback) {
   .show()
   .animate({
     "top": instance.travelTo,
-  }, instance.speed, callback);
+  }, instance.speed(), callback);
 };
 
 /**
@@ -303,8 +356,7 @@ presets.down.show = function (instance, callback) {
  presets.down.hide = function (instance, callback) {
   instance.$under.animate({
     "top": instance.travelFrom,
-  }, instance.speed, function () {
-    instance.$under.hide();
+  }, instance.speed(), function () {
     callback();
   });
 };
@@ -328,12 +380,12 @@ presets.up.show = function (instance, callback) {
   .show()
   .animate({
     "top": 0,
-  }, instance.speed, callback);
+  }, instance.speed(), callback);
 };
 presets.up.hide = function (instance, callback) {
   instance.$under.animate({
     'top': instance.dimensions[3]
-  }, instance.speed, function () {
+  }, instance.speed(), function () {
     instance.$under.hide();
     callback();
   });
@@ -383,21 +435,33 @@ $.fn.slideUnder.defaults = {
    *
    * @var string||object
    */
-  "preset"         : 'down',
+  "preset"           : 'down',
 
   /**
-   * Define how many milliseconds to travel 100px.
+   * Defines a speed preset or custom function.
+   *
+   * To use a preset include 'constant' or 'absolute'
+   *
+   * If writing your own function, you simply return an integar value, your
+   * function will receive instance as an argument.
+   *
+   * @var int||function
+   */
+  "speed"             : 'constant',
+
+  /**
+   * Intended to be used for controlling the speed function.
    *
    * @var int
    */
-  "speed"             : 200,
+  "rate"              : 400,
 
   /**
    * A callback function to call before initializing.
    *
    * @var function
    */
-  "afterInit"        : function (instance) {},
+  "afterInit"         : function (instance) {},
 
   /**
    * A function to call before the showing begins.

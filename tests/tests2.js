@@ -1,3 +1,23 @@
+QUnit.test(".slide-under-masque has derivitive id of under when under has id.", function(assert) {
+  var top      = '.top-layer';
+  var bottom   = '.bottom-layer';
+  $(bottom)
+  .attr('id', 'ready-for-breakfast')
+  .slideUnder(top);
+  var obj = $(bottom).data('slideUnder');
+  assert.deepEqual(obj.$masque.attr('id'), 'slide-under-masque-ready-for-breakfast');
+
+  $(bottom).attr('id', '');
+});
+
+QUnit.test(".slide-under-masque has default id.", function(assert) {
+  var top      = '.top-layer';
+  var bottom   = '.bottom-layer';
+  $(bottom).slideUnder(top);
+  var obj = $(bottom).data('slideUnder');
+  assert.deepEqual(obj.$masque.attr('id'), 'slide-under-masque-0');
+});
+
 QUnit.test("Preset class 'down' appears in container.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
@@ -55,26 +75,6 @@ QUnit.test("Passing a jQuery selector as options converts it to the over option.
 
 });
 
-QUnit.test("Layers and masque are position correctly on init.", function(assert) {
-  var top      = '.top-layer';
-  var bottom   = '.bottom-layer';
-  $(top).height(100);
-  $(bottom).height(300);
-  $(bottom).slideUnder({
-    "over": top,
-    "preset": 'down'
-  });
-  var obj = $(bottom).data('slideUnder');
-
-  assert.deepEqual($(bottom).css('top'), '-200px');
-  assert.deepEqual($(top).css('top'), '0px');
-  assert.deepEqual(obj.$masque.css('top'), '0px');
-
-  $(top).height('');
-  $(bottom).height('');
-  $(bottom).slideUnder('destroy');  
-});
-
 QUnit.test("Calling with 'hide' or 'show' shows performs the corresponding methods.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
@@ -105,7 +105,7 @@ QUnit.test("Calling with 'hide' or 'show' shows performs the corresponding metho
   assert.ok(!obj.isVisible());
 });
 
-QUnit.test("Speed calculates correctly", function(assert) {
+QUnit.test("Speed calculates correctly when set to constant.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
   var toggle   = '.toggle';
@@ -115,13 +115,27 @@ QUnit.test("Speed calculates correctly", function(assert) {
   $(bottom).slideUnder({
     "over": top,
     "toggle": toggle,
-    "speed": 100,
+    "speed": 'constant',
+    "rate": 100
   });
   var obj = $(bottom).data('slideUnder');
 
-  assert.deepEqual(obj.speed, 100);
+  assert.deepEqual(obj.speed(), 50);
   $(bottom).slideUnder('destroy');
   $(top).add($(bottom)).removeAttr('style');
+});
+
+QUnit.test("Rate is returned when speed is set to absolute", function(assert) {
+  var top      = '.top-layer';
+  var bottom   = '.bottom-layer';
+  $(bottom).slideUnder({
+    over: top,
+    speed: 'absolute',
+    rate: 333
+  });
+  var obj = $(bottom).data('slideUnder');
+
+  assert.deepEqual(obj.speed(), 333);
 });
 
 QUnit.test("A second call using a different under element places second .masque inside .slide-under-container.", function(assert) {

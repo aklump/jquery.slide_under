@@ -12,9 +12,10 @@
   <script>
   (function($) {
     $('document').ready(function(){
-
-      // Example 1a
       $("#bottom-1a").slideUnder("#top-1a");
+      $("#space-needle").slideUnder('#top-1a');
+      var spaceNeedle = $("#space-needle").data('slideUnder');
+      var bottom1a = $("#bottom-1a").data('slideUnder');
       $('#show-1a').click(function () {
         $("#bottom-1a").slideUnder('show');
         return false;
@@ -23,17 +24,22 @@
         $("#bottom-1a").slideUnder('hide');
         return false;
       });
-
-      // Example 2
-      $('#bottom-2').slideUnder({
-        "toggle": '#toggle-2',
-        "over": '#top-2',
+      $('#toggle-1a').click(function () {
+        $("#bottom-1a").slideUnder('toggle');
+        return false;
       });
-      $('#bottom-2-2').slideUnder({
-        "toggle": '#toggle-2-2',
-        "over": '#top-2',
+      $('#constant').click(function () {
+        spaceNeedle.options.speed = 'constant';
+        bottom1a.options.speed    = 'constant';
+        $("#space-needle").slideUnder('toggle');
+        $("#bottom-1a").slideUnder("toggle");
       });
-
+      $('#absolute').click(function () {
+        spaceNeedle.options.speed = 'absolute';
+        bottom1a.options.speed    = 'absolute';
+        $("#space-needle").slideUnder('toggle');
+        $("#bottom-1a").slideUnder("toggle");
+      });
     });
   })(jQuery);
   </script>
@@ -57,8 +63,9 @@
     <!-- Key features of jquery.slide_under.js -->
     <div class="well">
       <ul>
-        <li>Achieve the affect of one element sliding under another and disappearing.</li>
+        <li>Produces the affect of one element sliding under another element and disappearing.</li>
         <li>Does not tweak the dimensions of the underlayer like slideUp() and slideDown().</li>
+        <li>Multiple speed algorithms for different effects with adjustable rates.</li>
       </ul>
     </div>
 
@@ -69,21 +76,24 @@
     
     <h2>Demo Instructions</h2>
     <ol>
-      <li>Click the <em>show</em> link under Example 1a; then click <em>hide</em>.</li>
+      <li>Click the <em>toggle</em> link; click it again.</li>
+      <li>Click the <em>show</em> link; then click <em>hide</em>.</li>
+      <li>Compare speed algorithms <a href="#" id="constant">constant</a> with <a href="#" id="absolute">absolute</a>.</li>
+      <li>View <a href="demo.html">more demos</a>.</li>
     </ol>
     <hr />
 
-    <h2>Example 1a</h2>
-    
-    <p class="lead">Instantiate with top element selector as string argument and use explicit form of the hide/show to trigger the slide.</p>
-
+    <a href="#" id="toggle-1a">Toggle</a>
     <a href="#" id="show-1a">Show</a>
     <a href="#" id="hide-1a">Hide</a>
+
     <img src="images/eiffel-tower.jpg" id="bottom-1a"/>
+    <img src="images/space-needle.jpg" alt="Space Needle" id="space-needle"/>
     <div class="over" id="top-1a"></div>
 
     <h3>Html</h3>
-    <pre>&lt;a href="#" id="show-1a">Show&lt;/a>
+    <pre>&lt;a href="#" id="toggle-1a">Toggle</a>
+&lt;a href="#" id="show-1a">Show&lt;/a>
 &lt;a href="#" id="hide-1a">Hide&lt;/a>
 &ltimg src="images/eiffel-tower.jpg" id="bottom-1a"/>
 &lt;div id="top-1a">Overlayer&lt;/div></pre>
@@ -100,68 +110,10 @@ $('#show-1a').click(function () {
 $('#hide-1a').click(function () {
   $("#bottom-1a").slideUnder('hide');
   return false;
-});</pre>
-
-    <h2>Example 1b</h2>
-    <p class="lead">Rewrite the Javascript to show how you can access the SlideUnder object directly and trigger it's methods for exactly the same functionality as in 1a.</p>
-    
-    <pre>$("#bottom-1a").slideUnder("#top-1a");
-var obj = $("#bottom-1a").data('slideUnder');
-
-$('#show-1a').click(function () {
-  obj.show();
-  return false;
 });
-$('#hide-1a').click(function () {
-  obj.hide();
-  return false;
+$('#toggle-1a').click(function () {
+  $("#bottom-1a").slideUnder("toggle");
 });</pre>
-
-
-
-
-    <h2>Example Two</h2>
-    <p class="lead">Use the toggle option and allow plugin to handle hide/show methods automatically.</p>
-        
-    <button id="toggle-2" class="btn btn-info toggle2">Simple toggle</button>
-    <div id="toggle-2-2" class="toggle">
-      <button class="btn btn-success toggle-show">Click to reveal the hidden layer</button>
-      <button class="btn btn-danger toggle-hide">Click to retract the layer</button>
-    </div>
-
-    <img src="images/space-needle.jpg" alt="Space Needle" id="bottom-2-2"/>
-    <img src="images/eiffel-tower.jpg" alt="Eiffel Tower" id="bottom-2"/>
-    <div id="top-2" class="over">Top Layer</div>
-
-    <h3>Markup</h3>
-
-    <pre>&lt;!-- This element is used to toggle display-->
-&lt;div class="toggle">Show/Hide&lt;/div> 
-
-&lt;!-- The underlayer element should come first and will appear to slide out from
-under the element that comes second. -->
-&lt;img src="images/eiffel-tower.jpg" class="bottom-layer"/>
-&lt;div class="top-layer">Overlayer&lt;/div></pre>
-    
-    <h3>Javascript</h3>
-    <pre>
-$(".bottom-layer").slideUnder({
-  "over": ".over-layer",
-  "toggle": ".toggle"
-});
-    </pre>
-
-
-
-
-
-
-
-
-
-
-
-
 
     <hr />
     <p class="text-muted"><strong>jquery.slide_under</strong> is brought to you by <a href="http://www.intheloftstudios.com">In the Loft Studios</a></p>
