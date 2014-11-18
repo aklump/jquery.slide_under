@@ -1,5 +1,5 @@
 /**
- * Underlayer Slide jQuery JavaScript Plugin v1.0.3
+ * Underlayer Slide jQuery JavaScript Plugin v1.0.4
  * http://www.intheloftstudios.com/packages/jquery/jquery.slide_under
  *
  * jQuery plugin to simulate one element sliding under another without lose of dimensions.
@@ -7,7 +7,7 @@
  * Copyright 2013, Aaron Klump
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Mon Nov 17 17:51:16 PST 2014
+ * Date: Mon Nov 17 17:59:33 PST 2014
  */
 
 /**
@@ -68,20 +68,12 @@ var stackingZ = 1;
 
 // The actual plugin constructor
 function SlideUnder(element, options) {
-  var self = this;
-  self.class      = 'SlideUnder';
-  self.element    = element;
-  self.options    = $.extend( {}, $.fn.slideUnder.defaults, options) ;
-  self.defaults   = $.fn.slideUnder.defaults;
-  self.$under     = $(self.element);
-  self.$over      = $(self.options.over);
-
-  // This prevents flashing content.
-  self.$under.hide();
-  $(window).load(function () {
-    self.$under.show();
-    self.init();
-  });
+  this.class      = 'SlideUnder';
+  this.element    = element;
+  this.options    = $.extend( {}, $.fn.slideUnder.defaults, options) ;
+  this.defaults  = $.fn.slideUnder.defaults;
+  
+  this.init();
 }
 
 SlideUnder.prototype.toString = function() {
@@ -113,6 +105,7 @@ SlideUnder.prototype.init = function () {
 
   // 
   // Overlayer
+  self.$over        = $(self.options.over);
   self.styles.over  = self.$over.attr('style');
   self.dimensions[0]     = self.$over.outerWidth();
   self.dimensions[1]     = self.$over.outerHeight();
@@ -132,6 +125,7 @@ SlideUnder.prototype.init = function () {
 
   //
   // Underlayer
+  self.$under       = $(self.element);
   self.styles.under = self.$under.attr('style');
   self.dimensions[2]     = self.$under.outerWidth();
   self.dimensions[3]     = self.$under.outerHeight();
@@ -610,6 +604,6 @@ $.fn.slideUnder.defaults = {
  *
  * @return {string}
  */
-$.fn.slideUnder.version = function() { return '1.0.3'; };
+$.fn.slideUnder.version = function() { return '1.0.4'; };
 
 })(jQuery, window, document);
