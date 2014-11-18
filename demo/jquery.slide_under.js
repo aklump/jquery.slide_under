@@ -1,5 +1,5 @@
 /**
- * Underlayer Slide jQuery JavaScript Plugin v1.0.5
+ * Underlayer Slide jQuery JavaScript Plugin v1.0.6
  * http://www.intheloftstudios.com/packages/jquery/jquery.slide_under
  *
  * jQuery plugin to simulate one element sliding under another without lose of dimensions.
@@ -7,7 +7,7 @@
  * Copyright 2013, Aaron Klump
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Mon Nov 17 18:04:51 PST 2014
+ * Date: Mon Nov 17 18:19:58 PST 2014
  */
 
 /**
@@ -77,12 +77,20 @@ function SlideUnder(element, options) {
   self.$over      = $(self.options.over);
   self.$toggle    = $(self.options.toggle);
 
-  // This prevents flashing content.
-  self.$under.hide();
-  $(window).load(function () {
+  // This will detect if we have any images in our targets and delay the
+  // initialization until after the images load.
+  var hasImages   = self.$under.is('img') || self.$over.is('img') || self.$under.find('img').length || self.$over.find('img').length;
+  if (hasImages) {
+    // This prevents flashing content while images load.
     self.$under.hide();
+    $(window).load(function () {
+      self.$under.show();
+      self.init();
+    });
+  }
+  else {
     self.init();
-  });
+  }
 }
 
 SlideUnder.prototype.toString = function() {
@@ -610,6 +618,6 @@ $.fn.slideUnder.defaults = {
  *
  * @return {string}
  */
-$.fn.slideUnder.version = function() { return '1.0.5'; };
+$.fn.slideUnder.version = function() { return '1.0.6'; };
 
 })(jQuery, window, document);
