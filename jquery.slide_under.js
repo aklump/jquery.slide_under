@@ -77,12 +77,20 @@ function SlideUnder(element, options) {
   self.$over      = $(self.options.over);
   self.$toggle    = $(self.options.toggle);
 
-  // This prevents flashing content.
-  self.$under.hide();
-  $(window).load(function () {
+  // This will detect if we have any images in our targets and delay the
+  // initialization until after the images load.
+  var hasImages   = self.$under.is('img') || self.$over.is('img') || self.$under.find('img').length || self.$over.find('img').length;
+  if (hasImages) {
+    // This prevents flashing content while images load.
     self.$under.hide();
+    $(window).load(function () {
+      self.$under.show();
+      self.init();
+    });
+  }
+  else {
     self.init();
-  });
+  }
 }
 
 SlideUnder.prototype.toString = function() {
