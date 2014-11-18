@@ -7,7 +7,7 @@
  * Copyright 2013, Aaron Klump
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Mon Nov 17 16:52:01 PST 2014
+ * Date: Mon Nov 17 17:12:25 PST 2014
  */
 
 /**
@@ -146,11 +146,11 @@ SlideUnder.prototype.init = function () {
   .css({
     overflow: 'hidden',
     position: 'absolute'
-  })
+  });
 
   if (self.options.initial !== 'visible') {
     self.$masque.hide();  
-  };
+  }
   
   self.masqueHeight = self.dimensions[1] + self.dimensions[3];
 
@@ -262,14 +262,12 @@ SlideUnder.prototype.toggle = function() {
 
 SlideUnder.prototype.makeVisible = function() {
   var self = this;
-  console.log(self.options);
   self.options.rate     = 0;
   self.options.speed    = 'absolute';
   self.show();
   self.options.rate     = self.defaults.rate;
   self.options.speed    = self.defaults.speed;
-  console.log(self.options);
-}
+};
 
 SlideUnder.prototype.makeHidden = function() {
   var self = this;
@@ -278,7 +276,7 @@ SlideUnder.prototype.makeHidden = function() {
   self.hide();
   self.options.rate     = self.defaults.rate;
   self.options.speed    = self.defaults.speed;
-}
+};
 
 SlideUnder.prototype.show = function() {
   var self      = this;
