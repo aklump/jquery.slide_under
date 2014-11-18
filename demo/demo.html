@@ -14,13 +14,15 @@
 
       // Example 1a
       $("#bottom-1a").slideUnder("#top-1a");
-      $('#show-1a').click(function () {
+      $('#show-1a').click(function (e) {
         $("#bottom-1a").slideUnder('show');
-        return false;
+        
+        return e.preventDefault();
       });
-      $('#hide-1a').click(function () {
+      $('#hide-1a').click(function (e) {
         $("#bottom-1a").slideUnder('hide');
-        return false;
+        
+        return e.preventDefault();
       });
 
       // Example up
@@ -39,6 +41,36 @@
         "toggle": '#toggle-2-2',
         "over": '#top-2',
       });
+
+      // Example 4
+      $('#piza-initial').slideUnder({
+        over: $('#top-initial'),
+        direction: 'up',
+        initial: 'visible',
+        beforeHide: function () {
+          alert('Take on final look...');
+        },
+        afterHide: function () {
+          alert('History has been made.');
+        },
+      });
+
+      var obj = $('#piza-initial').data('slideUnder');
+      $('#hide-piza').click(function (e) {
+        obj.hide();
+        return e.preventDefault();
+      });
+      $('#make-visible-piza').click(function (e) {
+        obj.makeVisible();
+        
+        return e.preventDefault();
+      });
+      $('#make-hidden-piza').click(function (e) {
+        obj.makeHidden();
+        
+        return e.preventDefault();
+      });
+
 
     });
   })(jQuery);
@@ -143,13 +175,28 @@ $(".bottom-layer").slideUnder({
     
 
 
+    <h2>Example 4</h2>
+    <p class="lead">Set initial state to visible and utilize beforeHide() and afterHide()<br/>callbacks.  Demo also makeVisible() and makeHidden().</p>
 
+    <a href="#" id="hide-piza">Topple</a>
+    <a href="#" id="make-visible-piza">makeVisible()</a>
+    <a href="#" id="make-hidden-piza">makeHidden()</a>
 
+    <img src="images/piza-tower.jpg" id="piza-initial"/>
+    <div class="over" id="top-initial"></div>
 
-
-
-
-
+    <h3>Javascript</h3>
+<pre>$('#piza-initial').slideUnder({
+  over: $('#top-initial'),
+  direction: 'up',
+  initial: 'visible',
+  beforeHide: function () {
+    alert('Take on final look...');
+  },
+  afterHide: function () {
+    alert('History has been made.');
+  },
+});</pre>    
 
 
     <hr />

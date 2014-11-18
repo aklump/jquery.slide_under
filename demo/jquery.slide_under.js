@@ -5,10 +5,25 @@
  * jQuery plugin to simulate one element sliding under another without lose of dimensions.
  *
  * Copyright 2013, Aaron Klump
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Mon Nov 17 13:22:21 PST 2014
+ * Date: Mon Nov 17 16:52:01 PST 2014
+ */
+
+/**
+ * Instantiate this plugin thus:
+ * @code
+ *   $('.under-layer').slideUnder({
+ *     "over"         : '#over-Layer',
+ *     "toggle"       : '#toggle',
+ *   });
+ * @endcode
  *
+ * To get the SlideUnder object after it's attached you can do this:
+ * @code
+ *   var slideUnderObject = $('.my-thing').data('slideUnder');
+ * @endcode
+ * 
  * Helper css classes applied by this plugin (all are prefixed):
  *
  * On the under element:
@@ -30,7 +45,21 @@
  * - showing
  * - hiding
  *
- * @license
+ * To call an object method, two forms are possible.  When you must pass
+ * arguments to the method, you should use the later form, obtaining an object
+ * first and then explicitely calling the method on it.
+ *   @code
+ *     $('.my-thing').slideUnder('{method}');
+ *   @endcode
+ *
+ *   or when arguments must be passed, or you already have the object:
+ *
+ *   @code
+ *     var obj = $('.my-thing').data('slideUnder');
+ *     obj.{method}(arg1, arg2, argN...);
+ *   @endcode
+ * 
+ * To destroy the effects of this you may call the destroy method.
  */
 ;(function($, window, document, undefined) {
 "use strict";
@@ -42,7 +71,7 @@ function SlideUnder(element, options) {
   this.class      = 'SlideUnder';
   this.element    = element;
   this.options    = $.extend( {}, $.fn.slideUnder.defaults, options) ;
-  this._defaults  = $.fn.slideUnder.defaults;
+  this.defaults  = $.fn.slideUnder.defaults;
   
   this.init();
 }
@@ -103,7 +132,9 @@ SlideUnder.prototype.init = function () {
   self.$under
   .wrap('<div class="' + p + 'masque"></div>')
   .addClass(p + 'under ' + p + 'processed')
-  .css('position', 'absolute');
+  .css({
+    position: 'absolute',
+  });
 
   //
   // Masque
@@ -116,9 +147,11 @@ SlideUnder.prototype.init = function () {
     overflow: 'hidden',
     position: 'absolute'
   })
-  // It may seem superfluous to hide this, but we do it so that a call to
-  // $().is(':visible') is more intuitive.
-  .hide();  
+
+  if (self.options.initial !== 'visible') {
+    self.$masque.hide();  
+  };
+  
   self.masqueHeight = self.dimensions[1] + self.dimensions[3];
 
   //
@@ -157,16 +190,16 @@ SlideUnder.prototype.init = function () {
     self.$shim = $shim;
   }
 
-  // The distance needed to travel during expose/hide op.
-  self.travelFrom   = self.dimensions[3] * -1 + self.dimensions[1];
-  self.travelTo     = self.dimensions[1];
-  
   // Callbacks
   if (typeof self.options.direction.afterInit === 'function') {
     self.options.direction.afterInit(self);
   }
-  self.options.afterInit(self);
 
+  if (self.options.initial === 'visible') {
+    self.makeVisible();
+  }
+
+  self.options.afterInit(self);
 };
 
 SlideUnder.prototype.destroy = function () {
@@ -226,6 +259,26 @@ SlideUnder.prototype.isVisible = function() {
 SlideUnder.prototype.toggle = function() {
   return this.isVisible() ? this.hide() : this.show();
 };
+
+SlideUnder.prototype.makeVisible = function() {
+  var self = this;
+  console.log(self.options);
+  self.options.rate     = 0;
+  self.options.speed    = 'absolute';
+  self.show();
+  self.options.rate     = self.defaults.rate;
+  self.options.speed    = self.defaults.speed;
+  console.log(self.options);
+}
+
+SlideUnder.prototype.makeHidden = function() {
+  var self = this;
+  self.options.rate     = 0;
+  self.options.speed    = 'absolute';
+  self.hide();
+  self.options.rate     = self.defaults.rate;
+  self.options.speed    = self.defaults.speed;
+}
 
 SlideUnder.prototype.show = function() {
   var self      = this;
@@ -324,9 +377,8 @@ speeds.absolute = function (instance) {
  * @return {int}
  */
 speeds.constant = function (instance) {
-  return instance.options.rate * Math.abs(instance.travelFrom) / 200;
+  return instance.options.rate * (instance.dimensions[1] * -1 + instance.dimensions[3])  / 200;
 };
-
 
 /**
  * Defines one or more presets to use for animation.
@@ -357,7 +409,9 @@ directions.down.name = 'down';
  * @var function
  */
 directions.down.afterInit = function (instance) {
-  instance.$under.css('top', instance.travelFrom);
+  // Sets this up for the position of hidden.
+  var top = instance.dimensions[3] * -1 + instance.dimensions[1];
+  instance.$under.css('top', top);
 };
 
 /**
@@ -369,8 +423,9 @@ directions.down.afterInit = function (instance) {
  * @var function
  */
 directions.down.show = function (instance, callback) {
+  var top = instance.dimensions[1];
   instance.$under.animate({
-    "top": instance.travelTo,
+    "top": top,
   }, instance.speed(), callback);
 };
 
@@ -383,8 +438,9 @@ directions.down.show = function (instance, callback) {
  * @var function
  */
  directions.down.hide = function (instance, callback) {
+  var top = instance.dimensions[3] * -1 + instance.dimensions[1];
   instance.$under.animate({
-    "top": instance.travelFrom,
+    "top": top,
   }, instance.speed(), function () {
     callback();
   });
@@ -398,37 +454,31 @@ directions.down.show = function (instance, callback) {
 directions.up = {};
 directions.up.name = 'up';
 directions.up.afterInit = function (instance) {
-  instance.$masque.css('marginTop', -1 * (instance.dimensions[3]));
-  // instance.$container.css('marginTop', -1 * (instance.dimensions[3]));
-  instance.$over.css('bottom', 0);
-  instance.$under
-  .css('top', instance.dimensions[3])
-  .hide();
+  instance.$masque.css('marginTop', -1 * instance.dimensions[3]);
+  instance.$under.css('top', instance.dimensions[3]);
 };
 directions.up.show = function (instance, callback) {
   instance.$under
-  .show()
   .animate({
-    "top": 0,
+    "top": 0
   }, instance.speed(), callback);
 };
 directions.up.hide = function (instance, callback) {
   instance.$under.animate({
     'top': instance.dimensions[3]
   }, instance.speed(), function () {
-    instance.$under.hide();
     callback();
   });
 };
 
 
-$.fn.slideUnder = function(options) {
+$.fn.slideUnder = function(options, methodArgs) {
   return this.each(function () {
     var obj = $.data(this, 'slideUnder');
 
     // Sniff out a string method.
     if (typeof options === 'string' && obj && typeof obj[options] === 'function') {
-      obj[options]();
+      obj[options](methodArgs);
     }
     else {
       // If it's a string and it's not a method, it's a jQuery selector.
@@ -438,7 +488,7 @@ $.fn.slideUnder = function(options) {
 
       if ($(options.over).length === 0) {
         throw 'The "over" option must reference an existing DOM element.';
-      };
+      }
 
       $.data(this, 'slideUnder', new SlideUnder(this, options));    
     }
@@ -468,19 +518,19 @@ $.fn.slideUnder.defaults = {
    *
    * @var string||object
    */
-  "direction"         : 'down',
+  "direction"         : "down",
 
   /**
    * Defines a speed preset or custom function.
    *
-   * To use a preset include 'constant' or 'absolute'
+   * To use a preset include "constant" or "absolute"
    *
    * If writing your own function, you simply return an integar value, your
    * function will receive instance as an argument.
    *
    * @var int||function
    */
-  "speed"             : 'constant',
+  "speed"             : "constant",
 
   /**
    * Intended to be used for controlling the speed function.
@@ -488,6 +538,15 @@ $.fn.slideUnder.defaults = {
    * @var int
    */
   "rate"              : 400,
+
+  /**
+   * The initial visibility of the underlayer.
+   *
+   * Valid options are: hidden or visible
+   *
+   * @var string
+   */
+  "initial"           : "hidden",
 
   /**
    * A callback function to call before initializing.
@@ -539,7 +598,7 @@ $.fn.slideUnder.defaults = {
    *
    * @var string
    */
-  "cssPrefix"         : 'slide-under-'  
+  "cssPrefix"         : "slide-under-"  
 };
 
 /**
