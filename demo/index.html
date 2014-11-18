@@ -94,18 +94,21 @@
       <li>Notice the underlayer comes <strong>before</strong> the overlayer in the DOM.  Do this and you won't have to tweak with z-index.</li>
     </ul>
     <h3>Javascript</h3>
-    <pre>$("#bottom-1a").slideUnder("#top-1a");
-$('#show-1a').click(function () {
-  $("#bottom-1a").slideUnder('show');
-  return false;
-});
-$('#hide-1a').click(function () {
-  $("#bottom-1a").slideUnder('hide');
-  return false;
-});
-$('#toggle-1a').click(function () {
-  $("#bottom-1a").slideUnder("toggle");
+    <pre>$(window).load(function(){
+  $("#bottom-1a").slideUnder("#top-1a");
+  $('#show-1a').click(function () {
+    $("#bottom-1a").slideUnder('show');
+    return false;
+  });
+  $('#hide-1a').click(function () {
+    $("#bottom-1a").slideUnder('hide');
+    return false;
+  });
+  $('#toggle-1a').click(function () {
+    $("#bottom-1a").slideUnder("toggle");
+  });
 });</pre>
+    <p><strong>If your layers contain images, then you should instantiate this plugin inside of <code>$(window).load()</code>.</strong></p>
 
     <hr />
     <p class="text-muted"><strong>jquery.slide_under</strong> is brought to you by <a href="http://www.intheloftstudios.com">In the Loft Studios</a></p>
