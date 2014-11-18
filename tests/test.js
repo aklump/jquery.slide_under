@@ -1,3 +1,30 @@
+QUnit.test("Options 'initial' = visible makes the underlayer visible on init and sized the masque.", function(assert) {
+  var top      = '#top-animation';
+  var bottom   = '#bottom-animation';
+  $(bottom).slideUnder({
+    over: top,
+    initial: "visible"
+  });
+  
+  assert.ok($(bottom).is(':visible'));
+  var obj = $(bottom).data('slideUnder');
+  assert.deepEqual(obj.$masque.height(), obj.dimensions[1] + obj.dimensions[3]);
+});
+
+QUnit.test("methods makeVisible & makeHidden work as expected.", function(assert) {
+  var top      = '#top-animation';
+  var bottom   = '#bottom-animation';
+  $(bottom).slideUnder(top);
+  var obj = $(bottom).data('slideUnder');
+  obj.makeVisible();
+  assert.ok(obj.isVisible());
+
+  obj.makeHidden();
+  assert.ok(!obj.isVisible());
+});
+
+
+
 QUnit.test("Classes hiding are applied during transitions.", function(assert) {
   var top      = '#top-animation';
   var bottom   = '#bottom-animation';
