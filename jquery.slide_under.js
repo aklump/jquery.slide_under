@@ -1,5 +1,5 @@
 /**
- * Underlayer Slide jQuery JavaScript Plugin v1.0.5
+ * Underlayer Slide jQuery JavaScript Plugin v1.0.6
  * http://www.intheloftstudios.com/packages/jquery/jquery.slide_under
  *
  * jQuery plugin to simulate one element sliding under another without lose of dimensions.
@@ -7,7 +7,7 @@
  * Copyright 2013, Aaron Klump
  * @license Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Mon Nov 17 18:04:51 PST 2014
+ * Date: Mon Nov 17 18:19:58 PST 2014
  */
 
 /**
@@ -618,6 +618,6 @@ $.fn.slideUnder.defaults = {
  *
  * @return {string}
  */
-$.fn.slideUnder.version = function() { return '1.0.5'; };
+$.fn.slideUnder.version = function() { return '1.0.6'; };
 
 })(jQuery, window, document);
