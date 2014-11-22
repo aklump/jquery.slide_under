@@ -1,5 +1,5 @@
 name = "Underlayer Slide"
 description = "jQuery plugin to simulate one element sliding under another without lose of dimensions."
 homepage = http://www.intheloftstudios.com/packages/jquery/jquery.slide_under
-version = "1.0.6"
+version = "1.0.7"
 author = Aaron Klump <sourcecode@intheloftstudios.com>
