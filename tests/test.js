@@ -144,7 +144,7 @@ QUnit.test("With two instances, two shims are created.", function(assert) {
   assert.deepEqual($('.slide-under-shim').length, 2);
 });
 
-QUnit.test("Passing shim = false prevents the dom object from being created.", function(assert) {
+QUnit.test("Passing shim = false prevents the dom object from being created and does not make the above absolute positioned.", function(assert) {
   var top      = '.top-layer';
   var bottom   = '.bottom-layer';
   $(bottom).slideUnder({
@@ -152,6 +152,10 @@ QUnit.test("Passing shim = false prevents the dom object from being created.", f
     over: top
   });
   assert.deepEqual($('.slide-under-shim').length, 0);
+  assert.deepEqual($(top).css('position'), 'static');
+
+  var obj = $(bottom).data('slideUnder');
+  assert.deepEqual(obj.$container.css('position'), 'static');
 });
 
 QUnit.test("Passing a jQuery selector as options converts it to the over option.", function(assert) {
