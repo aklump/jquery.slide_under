@@ -125,8 +125,7 @@ SlideUnder.prototype.init = function () {
   self.dimensions[0]     = self.$over.outerWidth();
   self.dimensions[1]     = self.$over.outerHeight();
   self.$over
-  .addClass(p + 'over')
-  .css('position', 'absolute');
+  .addClass(p + 'over');
 
   //
   // Shim element
@@ -136,6 +135,8 @@ SlideUnder.prototype.init = function () {
     .addClass(p + 'shim')
     .width(self.dimensions[0])
     .height(self.dimensions[1]);
+
+    self.$over.css('position', 'absolute');
   }
 
   //
